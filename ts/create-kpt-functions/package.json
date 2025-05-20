@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@types/argparse": "^1.0.38",
-    "@types/cli-interact": "^0.1.1",
+    "@types/cli-interact": "^0.1.4",
     "@types/fs-extra": "^9.0.13",
     "@types/jasmine": "^3.10.4",
     "@types/glob": "^7.2.0",
