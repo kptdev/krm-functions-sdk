@@ -32,7 +32,7 @@
     "posttest": "npm run lint"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.16.3",
+    "@kubernetes/client-node": "^0.22.3",
     "argparse": "^1.0.10",
     "chalk": "^4.1.2",
     "cli-interact": "^0.1.9",
