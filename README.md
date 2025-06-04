@@ -1,4 +1,6 @@
 # KRM Functions SDK
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk?ref=badge_shield)
+
 
 An opinionated Typescript SDK for implementing KRM functions.
 
@@ -22,6 +24,9 @@ Discussions are [here](https://github.com/kptdev/kpt/discussions).
 
 Code is under the [Apache License 2.0](LICENSE), documentation is [CC BY 4.0](LICENSE-documentation).
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk?ref=badge_large)
+
 ## Governance
 
 The governance of the kpt project and KRM Functiona Catalog are described in the
@@ -36,4 +41,3 @@ More information and links about the CNCF Code of Conduct are [here](code-of-con
 ## CNCF
 
 The kpt project including the KRM Functions Catalog is a [CNCF Sandbox](https://www.cncf.io/sandbox-projects/) project.
-
