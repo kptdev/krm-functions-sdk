@@ -1,6 +1,6 @@
 # KRM Functions SDK
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkptdev%2Fkrm-functions-sdk?ref=badge_shield)
-
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10658/badge)](https://www.bestpractices.dev/projects/10658)
 
 An opinionated Typescript SDK for implementing KRM functions.
 
