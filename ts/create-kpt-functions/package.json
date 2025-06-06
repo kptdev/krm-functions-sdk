@@ -51,7 +51,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/jasmine": "^3.10.4",
     "@types/glob": "^7.2.0",
-    "@types/mustache": "^4.1.0",
+    "@types/mustache": "^4.2.5",
     "@types/request-promise": "^4.1.48",
     "@types/validator": "^13.7.2",
     "@types/js-yaml": "^3.12.7",
