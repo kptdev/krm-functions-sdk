@@ -115,3 +115,7 @@ func (v *scalarVariant) FloatValue() (float64, bool) {
 func (v *scalarVariant) Node() *yaml.Node {
 	return v.node
 }
+
+func (v *scalarVariant) ToUntyped() (interface{}, error) {
+	return v.node.Value, nil
+}

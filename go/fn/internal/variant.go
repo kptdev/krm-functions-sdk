@@ -34,6 +34,7 @@ const (
 type variant interface {
 	GetKind() variantKind
 	Node() *yaml.Node
+	ToUntyped() (interface{}, error)
 }
 
 // nodes are expected to be key1,value1,key2,value2,...

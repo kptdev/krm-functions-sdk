@@ -310,3 +310,21 @@ func (o *MapVariant) GetMap(field string) *MapVariant {
 
 	return nil
 }
+
+func (o *MapVariant) ToUntyped() (interface{}, error) {
+	entries, err := o.Entries()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]interface{})
+	for k, v := range entries {
+		vv, err := v.ToUntyped()
+		if err != nil {
+			return nil, fmt.Errorf("k: %v, v: %v, err: %w", k, v, err)
+		}
+		result[k] = vv
+	}
+
+	return result, nil
+}

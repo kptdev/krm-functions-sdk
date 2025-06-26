@@ -49,3 +49,16 @@ func (v *sliceVariant) Elements() ([]*MapVariant, error) {
 func (v *sliceVariant) Add(node variant) {
 	v.node.Content = append(v.node.Content, node.Node())
 }
+
+func (v *sliceVariant) ToUntyped() (interface{}, error) {
+	var result []interface{}
+	for _, n := range v.node.Content {
+		vv, err := toVariant(n).ToUntyped()
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, vv)
+	}
+
+	return result, nil
+}
