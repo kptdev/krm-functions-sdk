@@ -39,7 +39,7 @@ func (rw *byteReadWriter) Read() (*ResourceList, error) {
 		}
 		items = append(items, obj)
 	}
-	obj, err := ParseKubeObject([]byte(rw.ByteReadWriter.FunctionConfig.MustString()))
+	obj, err := ParseKubeObject([]byte(rw.FunctionConfig.MustString()))
 	if err != nil {
 		return nil, err
 	}

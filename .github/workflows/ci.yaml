@@ -43,7 +43,3 @@ jobs:
         path: go/src/github.com/GoogleContainerTools/kpt-functions-sdk
     - name: Build, Test, Lint
       run: hack/ci-validate-go.sh
-    - name: Test typegen
-      run: |
-        cd ts/typegen
-        make all

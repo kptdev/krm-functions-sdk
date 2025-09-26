@@ -449,6 +449,8 @@ items:
     - test2
 `)
 
+const StrategyTypeRecreate = "Recreate"
+
 func TestGetNestedFields(t *testing.T) {
 	rl, _ := ParseResourceList(deploymentResourceList)
 	deployment := rl.Items[0]
@@ -459,7 +461,7 @@ func TestGetNestedFields(t *testing.T) {
 	if boolVal, _, _ := deployment.NestedBool("spec", "paused"); boolVal != true {
 		t.Errorf("deployment .spec.paused expected to be true, got %v", boolVal)
 	}
-	if stringVal, _, _ := deployment.NestedString("spec", "strategy", "type"); stringVal != "Recreate" {
+	if stringVal, _, _ := deployment.NestedString("spec", "strategy", "type"); stringVal != StrategyTypeRecreate {
 		t.Errorf("deployment .spec.strategy.type expected to be `Recreate`, got %v", stringVal)
 	}
 	if stringMapVal, _, _ := deployment.NestedStringMap("spec", "template", "spec", "nodeSelector"); !reflect.DeepEqual(stringMapVal, map[string]string{"disktype": "ssd"}) {
@@ -478,13 +480,13 @@ func TestGetNestedFields(t *testing.T) {
 	}
 
 	strategy, _, _ := deployment.NestedSubObject("spec", "strategy")
-	if stringVal := strategy.GetString("type"); stringVal != "Recreate" {
+	if stringVal := strategy.GetString("type"); stringVal != StrategyTypeRecreate {
 		t.Errorf("deployment .spec.strategy.type expected to be `Recreate`, got %v", stringVal)
 	}
 	if boolVal := spec.GetBool("paused"); boolVal != true {
 		t.Errorf("deployment .spec.paused expected to be true, got %v", boolVal)
 	}
-	if stringVal := spec.GetMap("strategy").GetString("type"); stringVal != "Recreate" {
+	if stringVal := spec.GetMap("strategy").GetString("type"); stringVal != StrategyTypeRecreate {
 		t.Errorf("deployment .spec.strategy.type expected to be `Recreate`, got %v", stringVal)
 	}
 	tmplSpec := spec.GetMap("template").GetMap("spec")
