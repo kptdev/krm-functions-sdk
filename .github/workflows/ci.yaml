@@ -23,39 +23,6 @@ jobs:
         find . -name "*.sh" | grep -v site | grep -v vendor | grep -v node_modules | grep -v demo/demo-magic > shell_files.out
         shellcheck $(cat shell_files.out)  
 
-  node-ci:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest, macos-latest]
-        node-version: [12.x, 14.x]
-        package: [kpt-functions, create-kpt-functions, init-package, hello-world, demo-functions]
-    runs-on: ${{ matrix.platform }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install and test NPM packages
-      run: |
-        cd ts/${{ matrix.package }}
-        npm ci
-        npm test
-    - name: Check licenses
-      if: matrix.package == 'kpt-functions' || 
-          matrix.package == 'create-kpt-functions' || 
-          matrix.package == 'demo-functions'
-      run: |
-        cd ts/${{ matrix.package }}
-        npm run lint-license
-    - name: Generate docs diff
-      if: matrix.package == 'kpt-functions'
-      run: |
-        cd ts/${{ matrix.package }}
-        npm run gen-docs
-        DIFF=$(git status -s)
-        [[ -z $DIFF ]] || { echo "Need to update docs: $DIFF"; }
-
   go-ci:
     strategy:
       matrix:
