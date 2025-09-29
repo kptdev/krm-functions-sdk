@@ -43,7 +43,3 @@ jobs:
         path: go/src/github.com/GoogleContainerTools/kpt-functions-sdk
     - name: Build, Test, Lint
       run: hack/ci-validate-go.sh
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v8
-      with:
-        version: v2.1

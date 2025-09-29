@@ -16,7 +16,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-make go-ci
+make go
 
 changes=$(git status --porcelain)
 if [ -n "${changes}" ]; then

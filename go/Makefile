@@ -1,14 +1,15 @@
 .PHONY: all
 all: fix vet fmt test lint
 
-# Linting in github CI should be done by a separate github action
-.PHONY: ci
-ci: fix vet fmt test
-
 GOPATH := $(shell go env GOPATH)
 GOBIN := $(shell go env GOPATH)/bin
 OUT_DIR := .out
 MODULES = $(shell find . -name 'go.mod' -print)
+
+.PHONY: api
+api:
+	(which swagger || go install github.com/go-swagger/go-swagger/cmd/swagger@v0.27.0)
+	$(GOPATH)/bin/swagger generate spec -m -w api/kptfile/v1 -o ../openapi/kptfile.yaml
 
 .PHONY: fix
 fix: $(MODULES)
