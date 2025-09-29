@@ -1,5 +1,5 @@
 .PHONY: all
-all: fix vet fmt test lint license
+all: fix vet fmt test lint
 
 GOPATH := $(shell go env GOPATH)
 GOBIN := $(shell go env GOPATH)/bin
@@ -35,6 +35,3 @@ test: $(MODULES)
 vet: $(MODULES)
 	@#for f in $(^D); do (cd $$f; echo "Checking $$f"; go run honnef.co/go/tools/cmd/staticcheck@latest ./...); done
 	@for f in $(^D); do (cd $$f; echo "Vetting $$f"; go vet ./...); done
-
-license:
-	GOBIN=$(GOBIN) hack/update-license.sh

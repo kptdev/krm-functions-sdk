@@ -30,8 +30,9 @@ func TestBuild(t *testing.T) {
 		// expected args is key, and expected return is value
 		cmdExpected []string
 		// expected env var is key, and existence is value
-		lookPathExpected map[string]bool
-		expectedError    string
+		lookPathExpected   map[string]bool
+		expectedError      string
+		dockerfileExpected bool
 	}{
 		"default build is ko, ko already exists": {
 			args: []string{""},
@@ -41,6 +42,7 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"ko": true,
 			},
+			dockerfileExpected: false,
 		},
 		"default build is ko, ko not exists": {
 			args: []string{""},
@@ -51,6 +53,7 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"ko": false,
 			},
+			dockerfileExpected: false,
 		},
 		"ko as builder, specify repo": {
 			args: []string{"--repo=gcr.io/test"},
@@ -60,6 +63,7 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"ko": true,
 			},
+			dockerfileExpected: false,
 		},
 		"ko as builder, specify tag": {
 			args: []string{"--repo=gcr.io/test", "--tag=v1"},
@@ -69,13 +73,15 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"ko": true,
 			},
+			dockerfileExpected: false,
 		},
 		"docker as builder, docker not exists": {
 			args: []string{"--builder=docker"},
 			lookPathExpected: map[string]bool{
 				"docker": false,
 			},
-			expectedError: "kfn requires that `docker` is installed and on the PATH",
+			dockerfileExpected: false,
+			expectedError:      "kfn requires that `docker` is installed and on the PATH",
 		},
 		"docker as builder, docker exists": {
 			args: []string{"--builder=docker"},
@@ -85,6 +91,7 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"docker": true,
 			},
+			dockerfileExpected: true,
 		},
 		"docker as builder, specify dockerfile": {
 			args: []string{"--builder=docker", "--dockerfile=tmp/Dockerfile"},
@@ -94,6 +101,7 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"docker": true,
 			},
+			dockerfileExpected: true,
 		},
 		"docker as builder, specify image": {
 			args: []string{"--builder=docker", "--image=dockertest:latest", "--dockerfile=tmp/Dockerfile"},
@@ -103,27 +111,34 @@ func TestBuild(t *testing.T) {
 			lookPathExpected: map[string]bool{
 				"docker": true,
 			},
+			dockerfileExpected: true,
 		},
 	}
 	for name, test := range testcases {
-		r := NewBuildRunner(context.TODO())
-		execCmdFn = func(envs []string, name string, args ...string) error {
-			fakeExecCmd(t, test.cmdExpected, envs, name, args...)
-			return nil
-		}
-		execLookPathFn = func(file string) (string, error) {
-			return "", fakeExecLookPath(t, test.lookPathExpected, file)
-		}
-		r.Command.SetArgs(test.args)
-		err := r.Command.Execute()
-		if test.expectedError == "" {
-			if err != nil {
-				t.Errorf("%v failed. got error: %v", name, err)
+		t.Run(name, func(t *testing.T) {
+
+			r := NewBuildRunner(context.TODO())
+			execCmdFn = func(envs []string, name string, args ...string) error {
+				fakeExecCmd(t, test.cmdExpected, envs, name, args...)
+				return nil
 			}
-		} else {
-			assert.EqualError(t, err, test.expectedError)
-		}
-		os.Remove("Dockerfile")
+			execLookPathFn = func(file string) (string, error) {
+				return "", fakeExecLookPath(t, test.lookPathExpected, file)
+			}
+			r.Command.SetArgs(test.args)
+			err := r.Command.Execute()
+			if test.expectedError == "" {
+				if err != nil {
+					t.Errorf("%v failed. got error: %v", name, err)
+				}
+			} else {
+				assert.EqualError(t, err, test.expectedError)
+			}
+			if test.dockerfileExpected {
+				err = os.Remove("Dockerfile")
+				assert.NoError(t, err)
+			}
+		})
 	}
 }
 

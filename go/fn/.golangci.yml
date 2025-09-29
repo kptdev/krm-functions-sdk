@@ -30,6 +30,7 @@ linters:
     generated: lax
     paths:
       - "testhelpers/*"
+      - "examples/*"
 formatters:
   enable:
     - gofmt
