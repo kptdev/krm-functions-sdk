@@ -23,7 +23,7 @@ fmt: $(MODULES)
 lint: $(MODULES)
 	@for f in $(^D); do \
 	(cd $$f; echo "Checking golangci-lint $$f"; \
-	(which $(GOPATH)/bin/golangci-lint || go install github.com/golangci/golangci-lint/cmd/golangci-lint@v2.5.0); \
+	(which $(GOPATH)/bin/golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.5.0); \
 	$(GOPATH)/bin/golangci-lint run ./...); \
 	done
 
