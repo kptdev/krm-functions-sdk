@@ -21,7 +21,9 @@ fmt: $(MODULES)
 .PHONY: lint
 lint: $(MODULES)
 	@for f in $(^D); do \
-		$(GOPATH)/bin/golangci-lint run ./...); \
+	(cd $$f; echo "Checking golangci-lint $$f"; \
+	(which $(GOPATH)/bin/golangci-lint || go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0); \
+	$(GOPATH)/bin/golangci-lint run ./...); \
 	done
 
 .PHONY: test

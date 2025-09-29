@@ -29,7 +29,7 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     env:
-      GOPATH: /home/runner/work/krm-functions-sdk/go
+      GOPATH: /home/runner/work/kpt-functions-sdk/go
       GO111MODULE: on
     steps:
     - name: Set up Go 1.24
@@ -40,7 +40,7 @@ jobs:
     - name: Check out code into GOPATH
       uses: actions/checkout@v1
       with:
-        path: go/src/github.com/kptdev/krm-functions-sdk
+        path: go/src/github.com/GoogleContainerTools/kpt-functions-sdk
     - name: Build, Test, Lint
       run: hack/ci-validate-go.sh
     - name: golangci-lint
