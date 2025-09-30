@@ -2,8 +2,6 @@ module github.com/kptdev/krm-functions-sdk/go/fn/internal_test
 
 go 1.24.3
 
-toolchain go1.24.5
-
 replace github.com/kptdev/krm-functions-sdk/go/fn v0.0.0 => ../..
 
 require (
