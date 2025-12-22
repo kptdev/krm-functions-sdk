@@ -53,6 +53,7 @@ const (
 
 	// UnknownNamespace is the special char for cluster-scoped or unknown-scoped resources. This is only used in upstream-identifier
 	UnknownNamespace = "~C"
+
 	// DefaultNamespace is the actual namespace value if a namespace-scoped resource has its namespace field unspecified.
 	DefaultNamespace = "default"
 )

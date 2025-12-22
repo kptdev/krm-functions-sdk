@@ -56,9 +56,9 @@ func TestBuild(t *testing.T) {
 			dockerfileExpected: false,
 		},
 		"ko as builder, specify repo": {
-			args: []string{"--repo=gcr.io/test"},
+			args: []string{"--repo=ghcr.io/test"},
 			cmdExpected: []string{
-				"KO_DOCKER_REPO=gcr.io/test ko build -B --tags latest",
+				"KO_DOCKER_REPO=ghcr.io/test ko build -B --tags latest",
 			},
 			lookPathExpected: map[string]bool{
 				"ko": true,
@@ -66,9 +66,9 @@ func TestBuild(t *testing.T) {
 			dockerfileExpected: false,
 		},
 		"ko as builder, specify tag": {
-			args: []string{"--repo=gcr.io/test", "--tag=v1"},
+			args: []string{"--repo=ghcr.io/test", "--tag=v1"},
 			cmdExpected: []string{
-				"KO_DOCKER_REPO=gcr.io/test ko build -B --tags v1",
+				"KO_DOCKER_REPO=ghcr.io/test ko build -B --tags v1",
 			},
 			lookPathExpected: map[string]bool{
 				"ko": true,

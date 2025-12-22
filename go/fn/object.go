@@ -16,12 +16,10 @@ package fn
 
 import (
 	"fmt"
-	"math"
 	"reflect"
 	"strconv"
 	"strings"
 
-	v1 "github.com/kptdev/kpt/pkg/api/kptfile/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
@@ -191,7 +189,7 @@ func (o *SubObject) NestedResource(ptr interface{}, fields ...string) (bool, err
 	return true, err
 }
 
-// NestedMap returns a map[string]string value of a nested field, false if not found and an error if not a map[string]string type.
+// NestedStringMap returns a map[string]string value of a nested field, false if not found and an error if not a map[string]string type.
 func (o *SubObject) NestedStringMap(fields ...string) (map[string]string, bool, error) {
 	var variant map[string]string
 	m, found, err := o.obj.GetNestedMap(fields...)
@@ -205,7 +203,7 @@ func (o *SubObject) NestedStringMap(fields ...string) (map[string]string, bool, 
 	return variant, found, err
 }
 
-// NestedStringSlice returns a map[string]string value of a nested field, false if not found and an error if not a map[string]string type.
+// NestedStringSlice returns a []string value of a nested field, false if not found and an error if not a []string type.
 func (o *SubObject) NestedStringSlice(fields ...string) ([]string, bool, error) {
 	var variant []string
 	s, found, err := o.obj.GetNestedSlice(fields...)
@@ -347,6 +345,18 @@ func (o *SubObject) SetNestedStringMap(value map[string]string, fields ...string
 	return o.SetNestedField(value, fields...)
 }
 
+// UpdateNestedStringMap updates the map[string]string `fields` value with the (key, value) pairs in `values`.
+// It returns error if the fields type is not map[string]string.
+func (o *SubObject) UpdateNestedStringMap(values map[string]string, fields ...string) error {
+	for field, value := range values {
+		path := append(fields, field)
+		if err := o.SetNestedString(value, path...); err != nil {
+			return fmt.Errorf("couldn't update field %s: %w", strings.Join(fields, "."), err)
+		}
+	}
+	return nil
+}
+
 // SetNestedStringSlice sets the `fields` value to []string `value`. It returns error if the fields type is not []string.
 func (o *SubObject) SetNestedStringSlice(value []string, fields ...string) error {
 	return o.SetNestedField(value, fields...)
@@ -435,11 +445,16 @@ func NewFromTypedObject(v interface{}) (*KubeObject, error) {
 	return asKubeObject(m), nil
 }
 
-// String serializes the object in yaml format.
-func (o *SubObject) String() string {
+// Bytes serializes the object in yaml format.
+func (o *SubObject) Bytes() []byte {
 	doc := internal.NewDoc([]*yaml.Node{o.obj.Node()}...)
 	s, _ := doc.ToYAML()
-	return string(s)
+	return s
+}
+
+// String serializes the object in yaml format.
+func (o *SubObject) String() string {
+	return string(o.Bytes())
 }
 
 // ShortString provides a human readable information for the KubeObject Identifier in the form of GVKNN.
@@ -480,6 +495,11 @@ func (o *KubeObject) GroupVersionKind() schema.GroupVersionKind {
 // GroupKind returns the schema.GroupKind for the specified object.
 func (o *KubeObject) GroupKind() schema.GroupKind {
 	return o.GroupVersionKind().GroupKind()
+}
+
+// Returns true if the two KubeObjects has the same (Group, Version, Kind, Namespace, Name)
+func (o *KubeObject) HasSameId(b *KubeObject) bool {
+	return *o.resourceIdentifier() == *b.resourceIdentifier()
 }
 
 // IsGroupVersionKind compares the given group, version, and kind with KubeObject's apiVersion and Kind.
@@ -683,119 +703,6 @@ func (o *KubeObject) IdAnnotation() int {
 	return i
 }
 
-type KubeObjects []*KubeObject
-
-func (o KubeObjects) Len() int      { return len(o) }
-func (o KubeObjects) Swap(i, j int) { o[i], o[j] = o[j], o[i] }
-func (o KubeObjects) Less(i, j int) bool {
-	idi := o[i].resourceIdentifier()
-	idj := o[j].resourceIdentifier()
-	idStrI := fmt.Sprintf("%s %s %s %s", idi.GetAPIVersion(), idi.GetKind(), idi.GetNamespace(), idi.GetName())
-	idStrJ := fmt.Sprintf("%s %s %s %s", idj.GetAPIVersion(), idj.GetKind(), idj.GetNamespace(), idj.GetName())
-	return idStrI < idStrJ
-}
-
-func (o KubeObjects) String() string {
-	var elems []string
-	for _, obj := range o {
-		elems = append(elems, strings.TrimSpace(obj.String()))
-	}
-	return strings.Join(elems, "\n---\n")
-}
-
-// Where will return the subset of objects in KubeObjects such that f(object) returns 'true'.
-func (o KubeObjects) Where(f func(*KubeObject) bool) KubeObjects {
-	var result KubeObjects
-	for _, obj := range o {
-		if f(obj) {
-			result = append(result, obj)
-		}
-	}
-	return result
-}
-
-// Not returns will return a function that returns the opposite of f(object), i.e. !f(object)
-func Not(f func(*KubeObject) bool) func(o *KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return !f(o)
-	}
-}
-
-// WhereNot will return the subset of objects in KubeObjects such that f(object) returns 'false'.
-// This is a shortcut for Where(Not(f)).
-func (o KubeObjects) WhereNot(f func(o *KubeObject) bool) KubeObjects {
-	return o.Where(Not(f))
-}
-
-// IsGVK returns a function that checks if a KubeObject has a certain GVK.
-// Deprecated: Prefer exact matching with IsGroupVersionKind or IsGroupKind
-func IsGVK(group, version, kind string) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.IsGVK(group, version, kind)
-	}
-}
-
-// IsGroupVersionKind returns a function that checks if a KubeObject has a certain GroupVersionKind.
-func IsGroupVersionKind(gvk schema.GroupVersionKind) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.IsGroupVersionKind(gvk)
-	}
-}
-
-// IsGroupKind returns a function that checks if a KubeObject has a certain GroupKind.
-func IsGroupKind(gk schema.GroupKind) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.IsGroupKind(gk)
-	}
-}
-
-// GetRootKptfile returns the root Kptfile. Nested kpt packages can have multiple Kptfile files of the same GVKNN.
-func (o KubeObjects) GetRootKptfile() *KubeObject {
-	kptfiles := o.Where(IsGVK(v1.KptFileGVK().Group, v1.KptFileGVK().Version, v1.KptFileGVK().Kind))
-	if len(kptfiles) == 0 {
-		return nil
-	}
-	minDepths := math.MaxInt32
-	var rootKptfile *KubeObject
-	for _, kf := range kptfiles {
-		path := kf.GetAnnotation(PathAnnotation)
-		depths := len(strings.Split(path, "/"))
-		if depths <= minDepths {
-			minDepths = depths
-			rootKptfile = kf
-		}
-	}
-	return rootKptfile
-}
-
-// IsName returns a function that checks if a KubeObject has a certain name.
-func IsName(name string) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.GetName() == name
-	}
-}
-
-// IsNamespace returns a function that checks if a KubeObject has a certain namespace.
-func IsNamespace(namespace string) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.GetNamespace() == namespace
-	}
-}
-
-// HasLabels returns a function that checks if a KubeObject has all the given labels.
-func HasLabels(labels map[string]string) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.HasLabels(labels)
-	}
-}
-
-// HasAnnotations returns a function that checks if a KubeObject has all the given annotations.
-func HasAnnotations(annotations map[string]string) func(*KubeObject) bool {
-	return func(o *KubeObject) bool {
-		return o.HasAnnotations(annotations)
-	}
-}
-
 // IsMetaResource returns a function that checks if a KubeObject is a meta resource. For now
 // this just includes the Kptfile
 func IsMetaResource() func(*KubeObject) bool {
@@ -828,6 +735,45 @@ func rnodeToKubeObject(rn *yaml.RNode) *KubeObject {
 	return asKubeObject(mapVariant)
 }
 
+// NewKubeObjectFromResourceNode creates a KubeObject from the deep copy of a yaml.RNode
+func NewKubeObjectFromResourceNode(rn *yaml.RNode) *KubeObject {
+	// create a deep copy of the RNode to avoid exposing internal state of the new KubeObject
+	return rnodeToKubeObject(rn.Copy())
+}
+
+// CopyToResourceNode returns a deep copy of the KubeObject's internal yaml.RNode
+func (o *KubeObject) CopyToResourceNode() *yaml.RNode {
+	return yaml.NewRNode(o.obj.Node()).Copy()
+}
+
+// MoveToResourceNode transfers the ownership of the internal yaml nodes of the KubeObject
+// into a new yaml.RNode, and leaves the original KubeObject empty.
+func (o *KubeObject) MoveToResourceNode() *yaml.RNode {
+	ynode := o.obj.Node()
+	o.SubObject = NewEmptyKubeObject().SubObject
+	return yaml.NewRNode(ynode)
+}
+
+// CopyToKubeObject makes a copy of the internal yaml nodes of the RNode into a new KubeObject.
+func CopyToKubeObject(rn *yaml.RNode) *KubeObject {
+	return rnodeToKubeObject(rn.Copy())
+}
+
+// MoveToKubeObject transfers the ownership of the internal yaml nodes of the RNode
+// into a new KubeObject, and leaves the original RNode empty.
+func MoveToKubeObject(rn *yaml.RNode) *KubeObject {
+	ret := rnodeToKubeObject(rn)
+	*rn = *yaml.MakeNullNode()
+	return ret
+}
+
+// Copy returns a deep copy of the KubeObject
+func (o *KubeObject) Copy() *KubeObject {
+	ynode := yaml.CopyYNode(o.obj.Node())
+	mapVariant := internal.NewMap(ynode)
+	return &KubeObject{SubObject{parentGVK: o.parentGVK, obj: mapVariant, fieldpath: ""}}
+}
+
 // SubObject represents a map within a KubeObject
 type SubObject struct {
 	parentGVK schema.GroupVersionKind
@@ -835,9 +781,23 @@ type SubObject struct {
 	obj       *internal.MapVariant
 }
 
+func (o *SubObject) IsEmpty() bool {
+	return o == nil || o.obj.IsEmpty()
+}
+
+func (o *SubObject) HasField(key string) bool {
+	return o.obj.HasKey(key)
+}
+
 func (o *SubObject) UpsertMap(k string) *SubObject {
 	m := o.obj.UpsertMap(k)
 	return &SubObject{obj: m, parentGVK: o.parentGVK, fieldpath: o.fieldpath + "." + k}
+}
+
+// SetMap  accepts a single key `k`, and ensures that the value of `k` is the same as the map it received
+// via `mapObject` in the form of a SubObject pointer.
+func (o *SubObject) SetMap(mapObj *SubObject, k string) error {
+	return o.obj.SetNestedMap(mapObj.obj, k)
 }
 
 // GetMap accepts a single key `k` whose value is expected to be a map. It returns

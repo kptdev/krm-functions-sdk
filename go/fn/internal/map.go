@@ -46,12 +46,21 @@ type MapVariant struct {
 	node *yaml.Node
 }
 
-func (o *MapVariant) GetKind() variantKind {
-	return variantKindMap
+func (o *MapVariant) GetKind() VariantKind {
+	return VariantKindMap
 }
 
 func (o *MapVariant) Node() *yaml.Node {
 	return o.node
+}
+
+func (o *MapVariant) IsEmpty() bool {
+	return o == nil || o.node == nil || len(o.node.Content) == 0
+}
+
+func (o *MapVariant) HasKey(key string) bool {
+	_, found := o.getVariant(key)
+	return found
 }
 
 func (o *MapVariant) Entries() (map[string]variant, error) {
@@ -275,11 +284,32 @@ func (nodes yamlKeyValuePairs) Swap(i, j int) { nodes[i], nodes[j] = nodes[j], n
 // otherwise it will insert a map at the specified field.
 // Note that if the value exists but is not a map, it will be replaced with a map.
 func (o *MapVariant) UpsertMap(field string) *MapVariant {
-	m := o.GetMap(field)
-	if m != nil {
-		return m
+	node, found := o.getVariant(field)
+
+	if found {
+		switch node := node.(type) {
+		case *MapVariant:
+			// field was found and it is a map
+			if !node.IsEmpty() {
+				return node
+			}
+			// if the map is empty, replace it with a new map
+			// this supposed to result in better formatting if the map value is specified as {}
+			_, err := o.remove(field)
+			if err != nil {
+				klog.Warningf("upsert: couldn't remove field %s: %v", field, err)
+			}
+
+		default:
+			// field was found and it is NOT a map
+			_, err := o.remove(field)
+			if err != nil {
+				log.Fatalf("KubeObject.UpsertMap(): couldn't remove mistyped field %s: %v", field, err)
+			}
+		}
 	}
 
+	// insert map at field
 	keyNode := &yaml.Node{
 		Kind:  yaml.ScalarNode,
 		Value: field,

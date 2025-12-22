@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
+	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -84,7 +85,7 @@ func ParseResourceList(in []byte) (*ResourceList, error) {
 	if rlObj.GetKind() != kio.ResourceListKind {
 		return nil, fmt.Errorf("input was of unexpected kind %q; expected ResourceList", rlObj.GetKind())
 	}
-	// Parse FunctionConfig. FunctionConfig can be empty, e.g. `kubeval` fn does not require a FunctionConfig.
+	// Parse FunctionConfig. FunctionConfig can be empty, e.g. `kubeconform` fn does not require a FunctionConfig.
 	fc, found, err := rlObj.obj.GetNestedMap("functionConfig")
 	if err != nil {
 		return nil, fmt.Errorf("failed when tried to get functionConfig: %w", err)
@@ -111,15 +112,27 @@ func ParseResourceList(in []byte) (*ResourceList, error) {
 	}
 
 	// Parse Results. Results can be empty.
-	res, found, err := rlObj.obj.GetNestedSlice("results")
+	res, found, err := rlObj.obj.GetNestedValue("results")
 	if err != nil {
-		return nil, fmt.Errorf("failed when tried to get results: %w", err)
+		return nil, pkgerrors.Wrap(err, "failed when trying to get results")
 	}
+
+	var resultsItems *internal.SliceVariant
+	// compatibility between kyaml versions
+	if m, ok := res.(*internal.MapVariant); ok {
+		resultsItems, found, err = m.GetNestedSlice("items")
+	} else if resultsItems, ok = res.(*internal.SliceVariant); !ok {
+		// no results
+	}
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "failed when trying to get results")
+	}
+
 	if found {
 		var results Results
-		err = res.Node().Decode(&results)
+		err = resultsItems.Node().Decode(&results)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode results: %w", err)
+			return nil, pkgerrors.Wrap(err, "failed to decode results")
 		}
 		rl.Results = results
 	}

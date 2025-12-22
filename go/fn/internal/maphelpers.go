@@ -180,19 +180,19 @@ func (o *MapVariant) SetNestedFloat(f float64, fields ...string) error {
 	return o.SetNestedValue(newFloatScalarVariant(f), fields...)
 }
 
-func (o *MapVariant) GetNestedSlice(fields ...string) (*sliceVariant, bool, error) {
+func (o *MapVariant) GetNestedSlice(fields ...string) (*SliceVariant, bool, error) {
 	node, found, err := o.GetNestedValue(fields...)
 	if err != nil || !found {
 		return nil, found, err
 	}
-	nodeS, ok := node.(*sliceVariant)
+	nodeS, ok := node.(*SliceVariant)
 	if !ok {
 		return nil, found, fmt.Errorf("incorrect type, was %T", node)
 	}
 	return nodeS, found, err
 }
 
-func (o *MapVariant) SetNestedSlice(s *sliceVariant, fields ...string) error {
+func (o *MapVariant) SetNestedSlice(s *SliceVariant, fields ...string) error {
 	return o.SetNestedValue(s, fields...)
 }
 

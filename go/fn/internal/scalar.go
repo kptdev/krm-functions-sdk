@@ -32,8 +32,8 @@ type scalarVariant struct {
 	node *yaml.Node
 }
 
-func (v *scalarVariant) GetKind() variantKind {
-	return variantKindScalar
+func (v *scalarVariant) GetKind() VariantKind {
+	return VariantKindScalar
 }
 
 func newStringScalarVariant(s string) *scalarVariant {

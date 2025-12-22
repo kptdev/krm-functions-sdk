@@ -18,34 +18,34 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-type sliceVariant struct {
+type SliceVariant struct {
 	node *yaml.Node
 }
 
-func NewSliceVariant(s ...variant) *sliceVariant {
+func NewSliceVariant(s ...variant) *SliceVariant {
 	node := buildSequenceNode()
 	for _, v := range s {
 		node.Content = append(node.Content, v.Node())
 	}
-	return &sliceVariant{node: node}
+	return &SliceVariant{node: node}
 }
 
-func (v *sliceVariant) GetKind() variantKind {
-	return variantKindSlice
+func (v *SliceVariant) GetKind() VariantKind {
+	return VariantKindSlice
 }
 
-func (v *sliceVariant) Node() *yaml.Node {
+func (v *SliceVariant) Node() *yaml.Node {
 	return v.node
 }
 
-func (v *sliceVariant) Clear() {
+func (v *SliceVariant) Clear() {
 	v.node.Content = nil
 }
 
-func (v *sliceVariant) Elements() ([]*MapVariant, error) {
+func (v *SliceVariant) Elements() ([]*MapVariant, error) {
 	return ExtractObjects(v.node.Content...)
 }
 
-func (v *sliceVariant) Add(node variant) {
+func (v *SliceVariant) Add(node variant) {
 	v.node.Content = append(v.node.Content, node.Node())
 }

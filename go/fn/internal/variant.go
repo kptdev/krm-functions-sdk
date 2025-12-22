@@ -23,16 +23,16 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-type variantKind string
+type VariantKind string
 
 const (
-	variantKindMap    variantKind = "Map"
-	variantKindSlice  variantKind = "Slice"
-	variantKindScalar variantKind = "Scalar"
+	VariantKindMap    VariantKind = "Map"
+	VariantKindSlice  VariantKind = "Slice"
+	VariantKindScalar VariantKind = "Scalar"
 )
 
 type variant interface {
-	GetKind() variantKind
+	GetKind() VariantKind
 	Node() *yaml.Node
 }
 
@@ -90,7 +90,7 @@ func toVariant(n *yaml.Node) variant {
 	case yaml.MappingNode:
 		return &MapVariant{node: n}
 	case yaml.SequenceNode:
-		return &sliceVariant{node: n}
+		return &SliceVariant{node: n}
 
 	default:
 		panic("unhandled yaml node kind")
@@ -150,7 +150,7 @@ func TypedObjectToMapVariant(v interface{}) (*MapVariant, error) {
 	return mv, err
 }
 
-func TypedObjectToSliceVariant(v interface{}) (*sliceVariant, error) {
+func TypedObjectToSliceVariant(v interface{}) (*SliceVariant, error) {
 	// The built-in types only have json tags. We can't simply do ynode.Encode(v),
 	// since it use the lowercased field name by default if no yaml tag is specified.
 	// This affects both k8s built-in types (e.g. appsv1.Deployment) and any types
@@ -177,7 +177,7 @@ func TypedObjectToSliceVariant(v interface{}) (*sliceVariant, error) {
 		return nil, fmt.Errorf("unable to convert strong typed object to yaml node: %w", err)
 	}
 
-	return &sliceVariant{node: node}, nil
+	return &SliceVariant{node: node}, nil
 }
 
 func MapVariantToTypedObject(mv *MapVariant, ptr interface{}) error {

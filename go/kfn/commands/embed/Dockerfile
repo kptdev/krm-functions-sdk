@@ -19,6 +19,6 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN go build -o /usr/local/bin/function ./
-FROM gcr.io/distroless/static:latest
+FROM scratch
 COPY --from=0 /usr/local/bin/function /usr/local/bin/function
 ENTRYPOINT ["function"]

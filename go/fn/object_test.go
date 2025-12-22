@@ -209,7 +209,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-labels:unstable
+    - image: ghcr.io/kptdev/krm-functions-catalog/set-labels:latest
       configPath: fn-config.yaml
 `)
 	item := []byte(`
@@ -335,7 +335,10 @@ kind: ResourceList
 `)
 
 func TestNilFnConfigResourceList(t *testing.T) {
-	rl, _ := ParseResourceList(noFnConfigResourceList)
+	rl, err := ParseResourceList(noFnConfigResourceList)
+	if err != nil {
+		t.Fatalf("Error parsing resource list: %v", err)
+	}
 	if rl.FunctionConfig == nil {
 		t.Errorf("Empty functionConfig in ResourceList should still be initialized to avoid nil pointer error")
 	}
@@ -370,7 +373,6 @@ func TestNilFnConfigResourceList(t *testing.T) {
 			t.Errorf("Nil KubeObject shall not have the field path `not-exist` exist, and not expect errors")
 		}
 	}
-	var err error
 	// Check that nil FunctionConfig should be editable.
 	{
 		err = rl.FunctionConfig.SetKind("CustomFn")
@@ -511,10 +513,10 @@ func TestSetNestedFields(t *testing.T) {
 	if stringMapVal, _, _ := o.NestedString("tags", "tag2"); stringMapVal != "test1" {
 		t.Errorf("KubeObject .tags.tag2 expected to get `test1`, got %v", stringMapVal)
 	}
-	err = o.SetNestedStringSlice([]string{"lable1", "lable2"}, "labels")
+	err = o.SetNestedStringSlice([]string{"label1", "label2"}, "labels")
 	assert.NoError(t, err)
-	if stringSliceVal, _, _ := o.NestedStringSlice("labels"); !reflect.DeepEqual(stringSliceVal, []string{"lable1", "lable2"}) {
-		t.Errorf("KubeObject .labels expected to get [`lable1`, `lable2`], got %v", stringSliceVal)
+	if stringSliceVal, _, _ := o.NestedStringSlice("labels"); !reflect.DeepEqual(stringSliceVal, []string{"label1", "label2"}) {
+		t.Errorf("KubeObject .labels expected to get [`label1`, `label2`], got %v", stringSliceVal)
 	}
 }
 
@@ -855,4 +857,151 @@ metadata:
 	if got != want {
 		t.Fatalf("unexpected result from GroupVersionKind(); got %v; want %v", got, want)
 	}
+}
+
+func TestRNodeInteroperability(t *testing.T) {
+	input := []byte(`
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-app
+  namespace: my-ns
+`)
+
+	var found bool
+	ko, err := ParseKubeObject(input)
+	if err != nil {
+		t.Fatalf("failed to parse object: %v", err)
+	}
+
+	// test copy to and from ResourceNode
+	rn := ko.CopyToResourceNode()
+	assert.Equal(t, "apps/v1", ko.GetAPIVersion())
+	assert.Equal(t, "StatefulSet", ko.GetKind())
+	assert.Equal(t, "my-app", ko.GetName())
+	assert.Equal(t, "my-ns", ko.GetNamespace())
+	assert.Equal(t, "apps/v1", rn.GetApiVersion())
+	assert.Equal(t, "StatefulSet", rn.GetKind())
+	assert.Equal(t, "my-app", rn.GetName())
+	assert.Equal(t, "my-ns", rn.GetNamespace())
+
+	ko2 := NewKubeObjectFromResourceNode(rn)
+	assert.Equal(t, "apps/v1", rn.GetApiVersion())
+	assert.Equal(t, "StatefulSet", rn.GetKind())
+	assert.Equal(t, "my-app", rn.GetName())
+	assert.Equal(t, "my-ns", rn.GetNamespace())
+	assert.Equal(t, "apps/v1", ko2.GetAPIVersion())
+	assert.Equal(t, "StatefulSet", ko2.GetKind())
+	assert.Equal(t, "my-app", ko2.GetName())
+	assert.Equal(t, "my-ns", ko2.GetNamespace())
+
+	// test move to and from ResourceNode
+	rn2 := ko2.MoveToResourceNode()
+	_, found, _ = ko2.NestedString("apiVersion")
+	assert.False(t, found)
+	_, found, _ = ko2.NestedString("kind")
+	assert.False(t, found)
+	_, found, _ = ko2.NestedString("metadata", "name")
+	assert.False(t, found)
+	_, found, _ = ko2.NestedString("metadata", "namespace")
+	assert.False(t, found)
+	assert.Equal(t, "apps/v1", rn2.GetApiVersion())
+	assert.Equal(t, "StatefulSet", rn2.GetKind())
+	assert.Equal(t, "my-app", rn2.GetName())
+	assert.Equal(t, "my-ns", rn2.GetNamespace())
+
+	ko3 := MoveToKubeObject(rn2)
+	assert.Equal(t, "apps/v1", ko3.GetAPIVersion())
+	assert.Equal(t, "StatefulSet", ko3.GetKind())
+	assert.Equal(t, "my-app", ko3.GetName())
+	assert.Equal(t, "my-ns", ko3.GetNamespace())
+	assert.Empty(t, rn2.GetApiVersion())
+	assert.Empty(t, rn2.GetKind())
+	assert.Empty(t, rn2.GetName())
+	assert.Empty(t, rn2.GetNamespace())
+}
+
+func TestDeepCopy(t *testing.T) {
+	input := []byte(`
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-app
+  namespace: my-ns
+`)
+
+	orig, err := ParseKubeObject(input)
+	if err != nil {
+		t.Fatalf("failed to parse object: %v", err)
+	}
+
+	copy := orig.Copy()
+	assert.Equal(t, orig.String(), copy.String())
+	copy.SetName("new-name")
+	assert.Equal(t, "my-app", orig.GetName())
+	assert.Equal(t, "new-name", copy.GetName())
+}
+
+func TestUpsert(t *testing.T) {
+	resources := []byte(`
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+  annotations:
+    config.kubernetes.io/local-config: "true"
+pipeline:
+  mutators:
+    - image: ghcr.io/kptdev/krm-functions-catalog/set-labels:latest
+      configPath: fn-config.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: whatever
+ labels:
+   app: myApp
+`)
+
+	toUpdate := []byte(`
+apiVersion: v1
+kind: Service
+metadata:
+ name: whatever
+ labels:
+   app: notMyApp
+`)
+
+	toInsert := []byte(`
+apiVersion: v1
+kind: Service
+metadata:
+ name: new
+ labels:
+   app: notMyApp
+`)
+
+	var objs KubeObjects
+	objs, err := ParseKubeObjects(resources)
+	if err != nil {
+		t.Fatalf("failed to parse objects: %v", err)
+	}
+
+	toUpdateObj, err := ParseKubeObject(toUpdate)
+	if err != nil {
+		t.Fatalf("failed to parse object: %v", err)
+	}
+	objs.Upsert(toUpdateObj)
+	assert.Equal(t, len(objs), 2)
+	assert.Equal(t, "whatever", objs[1].GetMap("metadata").GetString("name"))
+	assert.Equal(t, "notMyApp", objs[1].GetMap("metadata").GetMap("labels").GetString("app"))
+
+	toInsertObj, err := ParseKubeObject(toInsert)
+	if err != nil {
+		t.Fatalf("failed to parse object: %v", err)
+	}
+	objs.Upsert(toInsertObj)
+	assert.Equal(t, len(objs), 3)
+	assert.Equal(t, "new", objs[2].GetMap("metadata").GetString("name"))
+	assert.Equal(t, "notMyApp", objs[2].GetMap("metadata").GetMap("labels").GetString("app"))
 }
