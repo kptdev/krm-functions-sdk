@@ -280,7 +280,6 @@ status: {conditions: [{type: test, status: "True", message: Everything is awesom
 			gotCond, found := kptfile.GetTypedCondition("test")
 			assert.Equal(t, true, found, "condition not found")
 			assert.Equal(t, tc.cond, gotCond, "condition retrieved does not match the expected condition")
-
 		})
 	}
 }

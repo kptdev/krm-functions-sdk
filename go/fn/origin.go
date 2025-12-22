@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package fn
 
 import (
@@ -79,8 +80,8 @@ func (o *KubeObject) effectiveNamespace() string {
 	return UnknownNamespace
 }
 
-// GetId gets the Group, Kind, Namespace and Name as the ResourceIdentifier.
-func (o *KubeObject) GetId() *ResourceIdentifier {
+// GetID gets the Group, Kind, Namespace and Name as the ResourceIdentifier.
+func (o *KubeObject) GetID() *ResourceIdentifier {
 	group, _ := ParseGroupVersion(o.GetAPIVersion())
 	return &ResourceIdentifier{
 		Group:     group,
@@ -90,13 +91,13 @@ func (o *KubeObject) GetId() *ResourceIdentifier {
 	}
 }
 
-func parseUpstreamIdentifier(upstreamId string) (*ResourceIdentifier, error) {
-	upstreamId = strings.TrimSpace(upstreamId)
+func parseUpstreamIdentifier(upstreamID string) (*ResourceIdentifier, error) {
+	upstreamID = strings.TrimSpace(upstreamID)
 	r := regexp.MustCompile(upstreamIdentifierRegexPattern)
-	match := r.FindStringSubmatch(upstreamId)
+	match := r.FindStringSubmatch(upstreamID)
 	if match == nil {
 		return nil, &ErrInternalAnnotation{Message: fmt.Sprintf("annotation %v: %v is in bad format. expect %q",
-			UpstreamIdentifier, upstreamId, upstreamIdentifierFormat)}
+			UpstreamIdentifier, upstreamID, upstreamIdentifierFormat)}
 	}
 	matchGroups := make(map[string]string)
 	for i, name := range r.SubexpNames() {
@@ -112,21 +113,21 @@ func parseUpstreamIdentifier(upstreamId string) (*ResourceIdentifier, error) {
 	}, nil
 }
 
-// GetOriginId provides the `ResourceIdentifier` to identify the upstream origin of a KRM resource.
+// GetOriginID provides the `ResourceIdentifier` to identify the upstream origin of a KRM resource.
 // This origin is generated and maintained by kpt pkg management and is stored in the `internal.kpt.dev/upstream-identiifer` annotation.
 // If a resource does not have an upstream origin, we use its current meta resource ID instead.
-func (o *KubeObject) GetOriginId() (*ResourceIdentifier, error) {
-	upstreamId := o.GetAnnotation(UpstreamIdentifier)
-	if upstreamId != "" {
-		return parseUpstreamIdentifier(upstreamId)
+func (o *KubeObject) GetOriginID() (*ResourceIdentifier, error) {
+	upstreamID := o.GetAnnotation(UpstreamIdentifier)
+	if upstreamID != "" {
+		return parseUpstreamIdentifier(upstreamID)
 	}
-	return o.GetId(), nil
+	return o.GetID(), nil
 }
 
 // HasUpstreamOrigin tells whether a resource is sourced from an upstream package resource.
 func (o *KubeObject) HasUpstreamOrigin() bool {
-	upstreamId := o.GetAnnotation(UpstreamIdentifier)
-	return upstreamId != ""
+	upstreamID := o.GetAnnotation(UpstreamIdentifier)
+	return upstreamID != ""
 }
 
 // ParseGroupVersion parses a "apiVersion" to get the "group" and "version" values.

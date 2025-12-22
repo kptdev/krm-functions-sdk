@@ -65,9 +65,8 @@ func (kos KubeObjects) EnsureSingleItemAs(out any) error {
 // If the list contains an object with the same (Group, Version, Kind, Namespace, Name), then Upsert replaces it with `newObj`,
 // otherwise it appends `newObj` to the list
 func (kos *KubeObjects) Upsert(newObj *KubeObject) {
-
 	for i, kobj := range *kos {
-		if newObj.HasSameId(kobj) {
+		if newObj.HasSameID(kobj) {
 			(*kos)[i] = newObj
 			return
 		}
@@ -161,7 +160,7 @@ func IsGroupKind(gk schema.GroupKind) func(*KubeObject) bool {
 
 // GetRootKptfile returns the root Kptfile. Nested kpt packages can have multiple Kptfile files of the same GVKNN.
 func (kos KubeObjects) GetRootKptfile() *KubeObject {
-	kptfiles := kos.Where(IsGVK(v1.KptFileGroup, v1.KptFileVersion, v1.KptFileKind))
+	kptfiles := kos.Where(IsGroupVersionKind(v1.KptFileGVK()))
 	if len(kptfiles) == 0 {
 		return nil
 	}

@@ -36,21 +36,21 @@ metadata:
 func TestOrigin(t *testing.T) {
 	noGroup, _ := ParseKubeObject(resource)
 
-	if id, _ := noGroup.GetOriginId(); id.String() != "|ConfigMap|example|example" {
+	if id, _ := noGroup.GetOriginID(); id.String() != "|ConfigMap|example|example" {
 		t.Fatalf("GetOriginId() expect %v, got %v", "|ConfigMap|example|example", id)
 	}
 	defaultNamespace, _ := ParseKubeObject(resource)
-	if defaultNamespace.GetId().String() != "|ConfigMap|default|cm" {
-		t.Fatalf("GetId() expect %v, got %v", "|ConfigMap|default|cm", defaultNamespace.GetId())
+	if defaultNamespace.GetID().String() != "|ConfigMap|default|cm" {
+		t.Fatalf("GetId() expect %v, got %v", "|ConfigMap|default|cm", defaultNamespace.GetID())
 	}
-	sameIdAndOrigin, _ := ParseKubeObject(resourceCustom)
-	if id, _ := sameIdAndOrigin.GetOriginId(); id.String() != sameIdAndOrigin.GetId().String() {
+	sameIDAndOrigin, _ := ParseKubeObject(resourceCustom)
+	if id, _ := sameIDAndOrigin.GetOriginID(); id.String() != sameIDAndOrigin.GetID().String() {
 		t.Fatalf("expect the origin and id the same if upstream-identifier is not given, got OriginID %v, got ID %v",
-			id, sameIdAndOrigin.GetId())
+			id, sameIDAndOrigin.GetID())
 	}
 	unknownNamespace, _ := ParseKubeObject(resourceCustom)
-	if unknownNamespace.GetId().Namespace != UnknownNamespace {
+	if unknownNamespace.GetID().Namespace != UnknownNamespace {
 		t.Fatalf("expect unknown custom resource use namespace %v, got %v",
-			UnknownNamespace, unknownNamespace.GetId().Namespace)
+			UnknownNamespace, unknownNamespace.GetID().Namespace)
 	}
 }

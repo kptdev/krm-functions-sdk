@@ -168,7 +168,7 @@ func (o *SubObject) NestedSubObject(fields ...string) (SubObject, bool, error) {
 	return variant, true, nil
 }
 
-// NestedMap returns a map[string]string value of a nested field, false if not found and an error if not a map[string]string type.
+// NestedResource returns a map[string]string value of a nested field, false if not found and an error if not a map[string]string type.
 func (o *SubObject) NestedResource(ptr interface{}, fields ...string) (bool, error) {
 	if ptr == nil || reflect.ValueOf(ptr).Kind() != reflect.Ptr {
 		return false, fmt.Errorf("ptr must be a pointer to an object")
@@ -497,8 +497,8 @@ func (o *KubeObject) GroupKind() schema.GroupKind {
 	return o.GroupVersionKind().GroupKind()
 }
 
-// Returns true if the two KubeObjects has the same (Group, Version, Kind, Namespace, Name)
-func (o *KubeObject) HasSameId(b *KubeObject) bool {
+// HasSameID returns true if the two KubeObjects has the same (Group, Version, Kind, Namespace, Name)
+func (o *KubeObject) HasSameID(b *KubeObject) bool {
 	return *o.resourceIdentifier() == *b.resourceIdentifier()
 }
 
@@ -653,13 +653,13 @@ func (o *KubeObject) SetLabel(k, v string) error {
 	return o.SetNestedField(v, "metadata", "labels", k)
 }
 
-// Label returns one label with key k.
+// GetLabel returns one label with key k.
 func (o *KubeObject) GetLabel(k string) string {
 	v, _, _ := o.obj.GetNestedString("metadata", "labels", k)
 	return v
 }
 
-// Labels returns all labels.
+// GetLabels returns all labels.
 func (o *KubeObject) GetLabels() map[string]string {
 	v, _, _ := o.obj.GetNestedStringMap("metadata", "labels")
 	return v
@@ -692,8 +692,8 @@ func (o *KubeObject) IndexAnnotation() int {
 	return i
 }
 
-// IdAnnotation return -1 if not found.
-func (o *KubeObject) IdAnnotation() int {
+// IDAnnotation return -1 if not found.
+func (o *KubeObject) IDAnnotation() int {
 	anno := o.GetAnnotation(kioutil.IdAnnotation)
 
 	if anno == "" {
@@ -864,10 +864,4 @@ func (s *SliceSubObjects) MarshalJSON() ([]byte, error) {
 		node.Content = append(node.Content, subObject.obj.Node())
 	}
 	return yaml.NewRNode(node).MarshalJSON()
-}
-
-// DEPRECATED: Please use type-aware functions instead.
-// To parse struct object, please use `NestedResource`.
-func (o *SubObject) Get(_ interface{}, _ ...string) (bool, error) {
-	return false, fmt.Errorf("unsupported")
 }

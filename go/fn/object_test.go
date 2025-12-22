@@ -937,7 +937,7 @@ metadata:
 
 	copy := orig.Copy()
 	assert.Equal(t, orig.String(), copy.String())
-	copy.SetName("new-name")
+	assert.NoError(t, copy.SetName("new-name"))
 	assert.Equal(t, "my-app", orig.GetName())
 	assert.Equal(t, "new-name", copy.GetName())
 }

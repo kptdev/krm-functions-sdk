@@ -44,7 +44,6 @@ func NewKptfileFromKubeObjectList(objs KubeObjects) (*Kptfile, error) {
 	ret.Obj = objs.GetRootKptfile()
 	if ret.Obj == nil {
 		return nil, fmt.Errorf("the Kptfile object is missing from the package")
-
 	}
 	return &ret, nil
 }
@@ -132,9 +131,15 @@ func (kf *Kptfile) SetTypedCondition(condition kptfileapi.Condition) error {
 		if conditionSubObj.GetString("type") == condition.Type {
 			// use the SetNestedString methods as opposed to SetNestedStringMap
 			// in order to keep the order of new fields deterministic
-			conditionSubObj.SetNestedString(string(condition.Status), "status")
-			conditionSubObj.SetNestedString(condition.Reason, "reason")
-			conditionSubObj.SetNestedString(condition.Message, "message")
+			if err := conditionSubObj.SetNestedString(string(condition.Status), "status"); err != nil {
+				return err
+			}
+			if err := conditionSubObj.SetNestedString(condition.Reason, "reason"); err != nil {
+				return err
+			}
+			if err := conditionSubObj.SetNestedString(condition.Message, "message"); err != nil {
+				return err
+			}
 			return kf.SetConditions(conditions)
 		}
 	}
@@ -146,7 +151,7 @@ func (kf *Kptfile) SetTypedCondition(condition kptfileapi.Condition) error {
 	return kf.SetConditions(conditions)
 }
 
-// DeleteByTpe deletes all conditions with the given type
+// DeleteConditionByType deletes all conditions with the given type
 func (kf *Kptfile) DeleteConditionByType(conditionType string) error {
 	oldConditions, found, err := kf.Obj.NestedSlice(conditionsFieldName)
 	if err != nil {
@@ -185,7 +190,9 @@ func (kf *Kptfile) AddReadinessGates(gates []kptfileapi.ReadinessGate) error {
 			gateObjs = append(gateObjs, &ko.SubObject)
 		}
 	}
-	info.SetSlice(gateObjs, "readinessGates")
+	if err := info.SetSlice(gateObjs, "readinessGates"); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -197,6 +204,8 @@ func (kf *Kptfile) AddMutationFunction(fn *kptfileapi.Function) error {
 		return fmt.Errorf("failed to add mutator function (%s) to Kptfile: %w", fn.Image, err)
 	}
 	mutators = append(mutators, &ko.SubObject)
-	pipeline.SetSlice(mutators, "mutators")
+	if err := pipeline.SetSlice(mutators, "mutators"); err != nil {
+		return err
+	}
 	return nil
 }

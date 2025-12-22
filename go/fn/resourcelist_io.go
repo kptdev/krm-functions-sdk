@@ -16,14 +16,8 @@ package fn
 
 import (
 	"sigs.k8s.io/kustomize/kyaml/errors"
-	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
-
-// byteReadWriter wraps kio.ByteReadWriter
-type byteReadWriter struct {
-	kio.ByteReadWriter
-}
 
 // Read decodes input bytes into a ResourceList
 func (rw *byteReadWriter) Read() (*ResourceList, error) {

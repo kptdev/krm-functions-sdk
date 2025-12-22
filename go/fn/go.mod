@@ -5,8 +5,7 @@ go 1.24.7
 require (
 	github.com/go-errors/errors v1.5.1
 	github.com/google/go-cmp v0.7.0
-	github.com/kptdev/kpt v1.0.0-beta.57.0.20250625181933-26ae79c92ed2
-	github.com/pkg/errors v0.9.1
+	github.com/kptdev/kpt v1.0.0-beta.59
 	github.com/stretchr/testify v1.10.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/apimachinery v0.33.1
@@ -14,8 +13,10 @@ require (
 	// the dependencies, depending on them will likely to cause version skew for
 	// consumers. The dependencies for tests and examples should be isolated.
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/kustomize/kyaml v0.19.0
+	sigs.k8s.io/kustomize/kyaml v0.20.1
 )
+
+require github.com/pkg/errors v0.9.1
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

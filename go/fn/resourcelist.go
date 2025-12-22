@@ -123,6 +123,7 @@ func ParseResourceList(in []byte) (*ResourceList, error) {
 		resultsItems, found, err = m.GetNestedSlice("items")
 	} else if resultsItems, ok = res.(*internal.SliceVariant); !ok {
 		// no results
+		found = false
 	}
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "failed when trying to get results")
