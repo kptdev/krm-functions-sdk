@@ -6,11 +6,6 @@ GOBIN := $(shell go env GOPATH)/bin
 OUT_DIR := .out
 MODULES = $(shell find . -name 'go.mod' -print)
 
-.PHONY: api
-api:
-	(which swagger || go install github.com/go-swagger/go-swagger/cmd/swagger@v0.27.0)
-	$(GOPATH)/bin/swagger generate spec -m -w api/kptfile/v1 -o ../openapi/kptfile.yaml
-
 .PHONY: fix
 fix: $(MODULES)
 	@for f in $(^D); do (cd $$f; echo "Fixing $$f"; go fix ./...) || exit 1; done
@@ -19,12 +14,18 @@ fix: $(MODULES)
 fmt: $(MODULES)
 	@for f in $(^D); do (cd $$f; echo "Formatting $$f"; go fmt ./...); done
 
+.PHONY: install-golangci-lint
+install-golangci-lint:
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.2
+
 .PHONY: lint
-lint: $(MODULES)
+lint: install-golangci-lint lint-modules
+
+.PHONY: lint-modules
+lint-modules: $(MODULES)
 	@for f in $(^D); do \
 	(cd $$f; echo "Checking golangci-lint $$f"; \
-	(which $(GOPATH)/bin/golangci-lint || go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0); \
-	$(GOPATH)/bin/golangci-lint run ./...); \
+	$(GOBIN)/golangci-lint run ./...); \
 	done
 
 .PHONY: test
