@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022,2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ const (
 	// SeqIndentAnnotation records the sequence nodes indentation of the input resource
 	SeqIndentAnnotation string = internalPrefix + "seqindent"
 
-	// IdAnnotation records the id of the resource to map inputs to outputs
-	IdAnnotation string = internalPrefix + "id"
+	// IDAnnotation records the id of the resource to map inputs to outputs
+	IDAnnotation string = internalPrefix + "id"
 
 	// InternalAnnotationsMigrationResourceIDAnnotation is used to uniquely identify
 	// resources during round trip to and from a function execution. We will use it

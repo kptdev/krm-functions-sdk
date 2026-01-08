@@ -1,4 +1,4 @@
-// Copyright 2024 The kpt and Nephio Authors
+// Copyright 2024-2026 The kpt and Nephio Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,9 +93,6 @@ func (kf *Kptfile) Conditions() SliceSubObjects {
 }
 
 func (kf *Kptfile) SetConditions(conditions SliceSubObjects) error {
-	sort.SliceStable(conditions, func(i, j int) bool {
-		return conditions[i].GetString("type") < conditions[j].GetString("type")
-	})
 	return kf.Status().SetSlice(conditions, conditionsFieldName)
 }
 
@@ -169,31 +166,13 @@ func (kf *Kptfile) DeleteConditionByType(conditionType string) error {
 	return kf.SetConditions(newConditions)
 }
 
-func (kf *Kptfile) AddReadinessGates(gates []kptfileapi.ReadinessGate) error {
-	info := kf.Obj.UpsertMap("info")
-	gateObjs := info.GetSlice("readinessGates")
-	for _, gate := range gates {
-		// check if readiness gate already exists
-		found := false
-		for _, gateObj := range gateObjs {
-			if gateObj.GetString("conditionType") == gate.ConditionType {
-				found = true
-				break
-			}
-		}
-		// add if not found
-		if !found {
-			ko, err := NewFromTypedObject(gate)
-			if err != nil {
-				return err
-			}
-			gateObjs = append(gateObjs, &ko.SubObject)
-		}
-	}
-	if err := info.SetSlice(gateObjs, "readinessGates"); err != nil {
-		return err
-	}
-	return nil
+func (kf *Kptfile) ReadinessGates() SliceSubObjects {
+	ret, _, _ := kf.Obj.NestedSlice("info", "readinessGates")
+	return ret
+}
+
+func (kf *Kptfile) SetReadinessGates(gates SliceSubObjects) error {
+	return kf.Obj.UpsertMap("info").SetSlice(gates, "readinessGates")
 }
 
 func (kf *Kptfile) AddMutationFunction(fn *kptfileapi.Function) error {
@@ -204,8 +183,57 @@ func (kf *Kptfile) AddMutationFunction(fn *kptfileapi.Function) error {
 		return fmt.Errorf("failed to add mutator function (%s) to Kptfile: %w", fn.Image, err)
 	}
 	mutators = append(mutators, &ko.SubObject)
-	if err := pipeline.SetSlice(mutators, "mutators"); err != nil {
-		return err
+	return pipeline.SetSlice(mutators, "mutators")
+}
+
+// GetLabels returns the labels from the Kptfile
+func (kf *Kptfile) GetLabels() map[string]string {
+	return kf.Obj.GetLabels()
+}
+
+// SetLabels sets the labels in the Kptfile
+func (kf *Kptfile) SetLabels(labels map[string]string) {
+	for k, v := range labels {
+		_ = kf.Obj.SetLabel(k, v)
 	}
-	return nil
+
+	existing := kf.Obj.GetLabels()
+	var keysToDelete []string
+	for k := range existing {
+		if _, ok := labels[k]; !ok {
+			keysToDelete = append(keysToDelete, k)
+		}
+	}
+
+	sort.Strings(keysToDelete)
+
+	for _, k := range keysToDelete {
+		_ = kf.Obj.RemoveLabel(k)
+	}
+}
+
+// GetAnnotations returns the annotations from the Kptfile
+func (kf *Kptfile) GetAnnotations() map[string]string {
+	return kf.Obj.GetAnnotations()
+}
+
+// SetAnnotations sets the annotations in the Kptfile
+func (kf *Kptfile) SetAnnotations(annotations map[string]string) {
+	for k, v := range annotations {
+		_ = kf.Obj.SetAnnotation(k, v)
+	}
+
+	existing := kf.Obj.GetAnnotations()
+	var keysToDelete []string
+	for k := range existing {
+		if _, ok := annotations[k]; !ok {
+			keysToDelete = append(keysToDelete, k)
+		}
+	}
+
+	sort.Strings(keysToDelete)
+
+	for _, k := range keysToDelete {
+		_ = kf.Obj.RemoveAnnotation(k)
+	}
 }

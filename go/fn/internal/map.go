@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022,2025-2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -94,13 +94,6 @@ func (o *MapVariant) Entries() (map[string]variant, error) {
 	return entries, nil
 }
 
-func asString(node *yaml.Node) (string, bool) {
-	if node.Kind == yaml.ScalarNode && (node.Tag == "!!str" || node.Tag == "") {
-		return node.Value, true
-	}
-	return "", false
-}
-
 func (o *MapVariant) getVariant(key string) (variant, bool) {
 	valueNode, found := getValueNode(o.node, key)
 	if !found {
@@ -111,50 +104,17 @@ func (o *MapVariant) getVariant(key string) (variant, bool) {
 	return v, true
 }
 
-func getValueNode(m *yaml.Node, key string) (*yaml.Node, bool) {
-	children := m.Content
-	if len(children)%2 != 0 {
-		log.Fatalf("unexpected number of children for map %d", len(children))
-	}
-
-	for i := 0; i < len(children); i += 2 {
-		keyNode := children[i]
-
-		k, ok := asString(keyNode)
-		if ok && k == key {
-			valueNode := children[i+1]
-			return valueNode, true
-		}
-	}
-	return nil, false
-}
-
 func (o *MapVariant) set(key string, val variant) {
-	o.setYAMLNode(key, val.Node())
-}
-
-func (o *MapVariant) setYAMLNode(key string, node *yaml.Node) {
-	children := o.node.Content
-	if len(children)%2 != 0 {
-		log.Fatalf("unexpected number of children for map %d", len(children))
+	newNode := val.Node()
+	i := findMapKey(o.node, key)
+	if i >= 0 {
+		// update existing field
+		deepCopyFormatting(o.node.Content[i+1], newNode)
+		o.node.Content[i+1] = newNode
+	} else {
+		// insert new field at the end
+		o.node.Content = append(o.node.Content, buildStringNode(key), newNode)
 	}
-
-	for i := 0; i < len(children); i += 2 {
-		keyNode := children[i]
-
-		k, ok := asString(keyNode)
-		if ok && k == key {
-			// TODO: Copy comments?
-			oldNode := children[i+1]
-			children[i+1] = node
-			children[i+1].FootComment = oldNode.FootComment
-			children[i+1].HeadComment = oldNode.HeadComment
-			children[i+1].LineComment = oldNode.LineComment
-			return
-		}
-	}
-
-	o.node.Content = append(o.node.Content, buildStringNode(key), node)
 }
 
 func (o *MapVariant) remove(key string) (bool, error) {

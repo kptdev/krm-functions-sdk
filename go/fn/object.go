@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022,2025-2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -615,6 +615,9 @@ func (o *KubeObject) SetAnnotation(k, v string) error {
 // GetAnnotations returns all annotations.
 func (o *KubeObject) GetAnnotations() map[string]string {
 	v, _, _ := o.obj.GetNestedStringMap("metadata", "annotations")
+	if v == nil {
+		return map[string]string{}
+	}
 	return v
 }
 
@@ -622,6 +625,11 @@ func (o *KubeObject) GetAnnotations() map[string]string {
 func (o *KubeObject) GetAnnotation(k string) string {
 	v, _, _ := o.obj.GetNestedString("metadata", "annotations", k)
 	return v
+}
+
+func (o *KubeObject) RemoveAnnotation(k string) error {
+	_, err := o.RemoveNestedField("metadata", "annotations", k)
+	return err
 }
 
 // HasAnnotations returns whether the KubeObject has all the given annotations.
@@ -659,9 +667,17 @@ func (o *KubeObject) GetLabel(k string) string {
 	return v
 }
 
+func (o *KubeObject) RemoveLabel(k string) error {
+	_, err := o.RemoveNestedField("metadata", "labels", k)
+	return err
+}
+
 // GetLabels returns all labels.
 func (o *KubeObject) GetLabels() map[string]string {
 	v, _, _ := o.obj.GetNestedStringMap("metadata", "labels")
+	if v == nil {
+		return map[string]string{}
+	}
 	return v
 }
 
