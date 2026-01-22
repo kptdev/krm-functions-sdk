@@ -32,16 +32,16 @@ jobs:
       GOPATH: /home/runner/work/krm-functions-sdk/go
       GO111MODULE: on
     steps:
-    - name: Set up Go
-      uses: actions/setup-go@v6
-      with:
-        go-version-file: '${{ env.GOPATH }}/fn/go.mod'
-        cache: true
-      id: go
     - name: Check out code into GOPATH
       uses: actions/checkout@v5
       with:
         path: go/src/github.com/kptdev/krm-functions-sdk
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: go/src/github.com/kptdev/krm-functions-sdk/go/fn/go.mod
+        cache: true
+      id: go
     - name: Build, Test, Lint
       run: |
         cd go/src/github.com/kptdev/krm-functions-sdk
