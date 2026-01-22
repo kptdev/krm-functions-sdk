@@ -5,7 +5,7 @@ go 1.25.6
 require (
 	github.com/go-errors/errors v1.5.1
 	github.com/google/go-cmp v0.7.0
-	github.com/kptdev/kpt v1.0.0-beta.59
+	github.com/kptdev/kpt v1.0.0-beta.60
 	github.com/stretchr/testify v1.10.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/apimachinery v0.33.1
