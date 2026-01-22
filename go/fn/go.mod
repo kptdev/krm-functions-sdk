@@ -8,7 +8,7 @@ require (
 	github.com/kptdev/kpt v1.0.0-beta.60
 	github.com/stretchr/testify v1.10.0
 	gotest.tools v2.2.0+incompatible
-	k8s.io/apimachinery v0.33.1
+	k8s.io/apimachinery v0.34.1
 	// We must not include any core k8s APIs (e.g. k8s.io/api) in
 	// the dependencies, depending on them will likely to cause version skew for
 	// consumers. The dependencies for tests and examples should be isolated.

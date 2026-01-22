@@ -2,8 +2,6 @@ module github.com/kptdev/krm-functions-sdk/go/get-started
 
 go 1.25.6
 
-require github.com/kptdev/krm-functions-sdk/go/fn v0.0.0-20251015063938-03a9634d0809
-
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -15,7 +13,7 @@ require (
 	github.com/google/gnostic-models v0.6.9 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/kptdev/kpt v1.0.0-beta.58 // indirect
+	github.com/kptdev/kpt v1.0.0-beta.60 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
