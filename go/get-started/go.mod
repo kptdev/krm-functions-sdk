@@ -1,6 +1,6 @@
 module github.com/kptdev/krm-functions-sdk/go/get-started
 
-go 1.24.7
+go 1.25.6
 
 require github.com/kptdev/krm-functions-sdk/go/fn v0.0.0-20251015063938-03a9634d0809
 
