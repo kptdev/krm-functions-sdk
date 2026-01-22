@@ -32,10 +32,11 @@ jobs:
       GOPATH: /home/runner/work/krm-functions-sdk/go
       GO111MODULE: on
     steps:
-    - name: Set up Go 1.24.7
+    - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: 1.24.7
+        go-version-file: go/src/github.com/kptdev/krm-functions-catalog/go/fn/go.mod
+        cache: true
       id: go
     - name: Check out code into GOPATH
       uses: actions/checkout@v5
