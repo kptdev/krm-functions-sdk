@@ -18,11 +18,7 @@
 // to break a circular dependency (SDK depends on kpt, kpt depends on SDK).
 //
 // TARGET: Replace this package with an import from a central API repo
-// (e.g. github.com/kptdev/api) once that repo is created. See:
-// https://github.com/kptdev/kpt/issues/XXXX (TODO: link to proposal)
-//
-// Source: github.com/kptdev/kpt/pkg/api/kptfile/v1/types.go
-// Last synced: 2025-XX-XX from commit XXXXXXX (TODO: fill on merge)
+// (e.g. github.com/kptdev/api) once that repo is created.
 package kptfileapi
 
 import (
