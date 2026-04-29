@@ -1,6 +1,6 @@
 module github.com/kptdev/krm-functions-sdk/go/fn/internal_test
 
-go 1.25.7
+go 1.25.9
 
 replace github.com/kptdev/krm-functions-sdk/go/fn v0.0.0 => ../..
 

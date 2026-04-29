@@ -1,6 +1,6 @@
 module github.com/kptdev/krm-functions-sdk/go/kfn
 
-go 1.25.7
+go 1.25.9
 
 require (
 	github.com/heroku/color v0.0.6

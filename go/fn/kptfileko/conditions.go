@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"slices"
 
-	kptfileapi "github.com/kptdev/kpt/pkg/api/kptfile/v1"
+	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 

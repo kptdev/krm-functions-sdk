@@ -1,11 +1,10 @@
 module github.com/kptdev/krm-functions-sdk/go/fn
 
-go 1.25.7
+go 1.25.9
 
 require (
 	github.com/go-errors/errors v1.5.1
 	github.com/google/go-cmp v0.7.0
-	github.com/kptdev/kpt v1.0.0-beta.61
 	github.com/stretchr/testify v1.11.1
 	gotest.tools v2.2.0+incompatible
 	k8s.io/apimachinery v0.34.1
@@ -46,6 +45,4 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912 // indirect
-	sigs.k8s.io/kustomize/api v0.20.1 // indirect
-	sigs.k8s.io/yaml v1.6.0 // indirect
 )
