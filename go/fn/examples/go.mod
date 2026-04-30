@@ -1,6 +1,6 @@
 module github.com/kptdev/krm-functions-sdk/go/fn/examples
 
-go 1.25.9
+go 1.26.2
 
 replace github.com/kptdev/krm-functions-sdk/go/fn v0.0.0 => ../
 
