@@ -15,7 +15,11 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.21.1
 )
 
-require github.com/pkg/errors v0.9.1
+require (
+	github.com/pkg/errors v0.9.1
+	go.yaml.in/yaml/v3 v3.0.4
+	pgregory.net/rapid v1.3.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -39,7 +43,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/sys v0.44.0 // indirect
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -18,16 +18,70 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
+	"strings"
 
+	"github.com/kptdev/krm-functions-sdk/go/fn/internal/docs"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 )
 
-// AsMain evaluates the ResourceList from STDIN to STDOUT.
+// Option configures fn.AsMain behavior.
+type Option func(*mainConfig)
+
+// mainConfig holds configuration gathered from Options.
+type mainConfig struct {
+	readme   []byte // raw embedded README.md content
+	metadata []byte // raw embedded metadata.yaml content
+}
+
+// WithDocs registers embedded README and metadata content for --help and --doc.
+func WithDocs(readme []byte, meta []byte) Option {
+	return func(c *mainConfig) {
+		c.readme = readme
+		c.metadata = meta
+	}
+}
+
+// AsMain evaluates a KRM function. By default it reads a ResourceList from
+// STDIN, processes it, and writes the result to STDOUT.
+//
 // `input` can be
 // - a `ResourceListProcessor` which implements `Process` method
 // - a function `Runner` which implements `Run` method
-func AsMain(input any) error {
+//
+// Invocation modes (checked in this order):
+//   - --help: prints human-readable documentation to STDOUT and returns nil.
+//   - --doc: prints machine-readable JSON documentation to STDOUT and returns nil.
+//   - positional file args: reads KRM resources from files instead of STDIN.
+//   - no args: reads ResourceList from STDIN (default behavior).
+//
+// Options configure additional behavior such as documentation support
+// via WithDocs. Existing callers with no options continue to work unchanged.
+func AsMain(input any, opts ...Option) error {
+	// Apply options to build configuration.
+	var cfg mainConfig
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	// Check for --help and --doc flags before reading STDIN.
+	// --help always takes precedence over --doc regardless of argument order.
+	if slices.Contains(os.Args[1:], "--help") {
+		return handleHelp(&cfg)
+	}
+	if slices.Contains(os.Args[1:], "--doc") {
+		return handleDoc(&cfg)
+	}
+
+	// Collect non-flag positional arguments (file paths).
+	var filePaths []string
+	for _, arg := range os.Args[1:] {
+		if !strings.HasPrefix(arg, "--") {
+			filePaths = append(filePaths, arg)
+		}
+	}
+
 	err := func() error {
 		var p ResourceListProcessor
 		switch input := input.(type) {
@@ -38,6 +92,31 @@ func AsMain(input any) error {
 		default:
 			return fmt.Errorf("unknown input type %T", input)
 		}
+
+		// If file paths are provided, use file mode instead of STDIN.
+		if len(filePaths) > 0 {
+			rl, err := readFilesAsResourceList(filePaths)
+			if err != nil {
+				return err
+			}
+			success, fnErr := p.Process(rl)
+			out, yamlErr := rl.ToYAML()
+			if yamlErr != nil {
+				return yamlErr
+			}
+			_, outErr := os.Stdout.Write(out)
+			if outErr != nil {
+				return outErr
+			}
+			if fnErr != nil {
+				return fnErr
+			}
+			if !success {
+				return fmt.Errorf("error: function failure")
+			}
+			return nil
+		}
+
 		in, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return fmt.Errorf("unable to read from stdin: %v", err)
@@ -55,6 +134,73 @@ func AsMain(input any) error {
 		Logf("failed to evaluate function: %v", err)
 	}
 	return err
+}
+
+// handleHelp renders help text to STDOUT based on registered docs.
+func handleHelp(cfg *mainConfig) error {
+	if cfg.readme == nil && cfg.metadata == nil {
+		fmt.Fprint(os.Stdout, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
+		return nil
+	}
+
+	sections := docs.ParseMarkers(cfg.readme)
+	meta, err := docs.ParseMetadata(cfg.metadata)
+	if err != nil {
+		Logf("warning: invalid metadata YAML: %v", err)
+		meta = docs.Metadata{}
+	}
+
+	docs.RenderHelp(os.Stdout, sections, meta)
+	return nil
+}
+
+// handleDoc renders JSON documentation to STDOUT based on registered docs.
+func handleDoc(cfg *mainConfig) error {
+	if cfg.readme == nil && cfg.metadata == nil {
+		fmt.Fprint(os.Stdout, "{}")
+		return nil
+	}
+
+	sections := docs.ParseMarkers(cfg.readme)
+	meta, err := docs.ParseMetadata(cfg.metadata)
+	if err != nil {
+		Logf("warning: invalid metadata YAML: %v", err)
+		meta = docs.Metadata{}
+	}
+
+	return docs.RenderDoc(os.Stdout, sections, meta)
+}
+
+// readFilesAsResourceList reads KRM YAML from the given file paths,
+// assembles them into a ResourceList with an empty FunctionConfig.
+// Each file is parsed as one or more KRM YAML documents (separated by ---).
+// Empty files are valid (no items added). Returns a descriptive error if a
+// file does not exist or contains invalid YAML.
+func readFilesAsResourceList(paths []string) (*ResourceList, error) {
+	rl := &ResourceList{
+		FunctionConfig: NewEmptyKubeObject(),
+	}
+	for _, path := range paths {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return nil, fmt.Errorf("file not found: %s", path)
+			}
+			return nil, fmt.Errorf("failed to read file %s: %v", path, err)
+		}
+		// Empty files are valid — proceed with no items from this file.
+		if len(strings.TrimSpace(string(data))) == 0 {
+			continue
+		}
+		objects, err := ParseKubeObjects(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse KRM resources from %s: %v", path, err)
+		}
+		for _, obj := range objects {
+			rl.Items = append(rl.Items, obj)
+		}
+	}
+	return rl, nil
 }
 
 // Run evaluates the function. input must be a resourceList in yaml format. An
