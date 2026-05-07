@@ -265,10 +265,10 @@ func TestRenderHelp_FullSectionsAndMetadata(t *testing.T) {
 	sections := Sections{
 		Short:    "Set labels on all resources",
 		Long:     "The set-labels function adds or updates labels on all resources in the package.",
-		Examples: "  kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.1 -- label_name=label_value",
+		Examples: "  kpt fn eval --image ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1 -- label_name=label_value",
 	}
 	meta := Metadata{
-		Image:       "gcr.io/kpt-fn/set-labels:v0.1",
+		Image:       "ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1",
 		Description: "Set labels on all resources",
 		Tags:        []string{"mutator", "labels"},
 	}
@@ -320,10 +320,10 @@ func TestRenderDoc_ValidJSON_AllFields(t *testing.T) {
 	sections := Sections{
 		Short:    "Set labels on all resources",
 		Long:     "The set-labels function adds or updates labels.",
-		Examples: "  kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.1",
+		Examples: "  kpt fn eval --image ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1",
 	}
 	meta := Metadata{
-		Image:              "gcr.io/kpt-fn/set-labels:v0.1",
+		Image:              "ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1",
 		Description:        "Set labels on all resources",
 		Tags:               []string{"mutator", "labels"},
 		SourceURL:          "https://github.com/kptdev/krm-functions/tree/main/functions/go/set-labels",

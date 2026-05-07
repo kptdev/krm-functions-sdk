@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022, 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,17 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"os"
 
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
+
+//go:embed README.md
+var readme []byte
+
+//go:embed metadata.yaml
+var metadata []byte
 
 var _ fn.Runner = &YourFunction{}
 
@@ -41,7 +48,7 @@ func (r *YourFunction) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items
 
 func main() {
 	runner := fn.WithContext(context.Background(), &YourFunction{})
-	if err := fn.AsMain(runner); err != nil {
+	if err := fn.AsMain(runner, fn.WithDocs(readme, metadata)); err != nil {
 		os.Exit(1)
 	}
 }

@@ -2,9 +2,11 @@ module github.com/kptdev/krm-functions-sdk/go/get-started
 
 go 1.26.3
 
+// NOTE: replace directive is for in-repo development only.
+// External consumers should use: require github.com/kptdev/krm-functions-sdk/go/fn v1.x.x
 replace github.com/kptdev/krm-functions-sdk/go/fn => ../fn
 
-require github.com/kptdev/krm-functions-sdk/go/fn v1.0.2
+require github.com/kptdev/krm-functions-sdk/go/fn v1.0.0
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

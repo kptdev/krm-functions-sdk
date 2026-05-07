@@ -1,0 +1,8 @@
+image: ghcr.io/kptdev/krm-functions-catalog/some-function-name:v0.1
+description: Explain what this function does in one or two sentences.
+tags:
+  - mutator
+sourceURL: https://github.com/kptdev/krm-functions-sdk/tree/main/go/get-started
+examplePackageURLs: []
+license: Apache-2.0
+hidden: false

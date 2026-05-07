@@ -12,3 +12,6 @@ ts/create-kpt-functions/bin
 # rapid property-based testing failure reproductions
 **/testdata/rapid/
 
+# compiled binaries
+go/get-started/get-started
+

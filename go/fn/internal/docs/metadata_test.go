@@ -58,7 +58,7 @@ func genMetadata() *rapid.Generator[Metadata] {
 // --- Unit Tests for ParseMetadata ---
 
 func TestParseMetadata_CompleteValid(t *testing.T) {
-	input := []byte(`image: gcr.io/kpt-fn/set-labels:v0.1
+	input := []byte(`image: ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1
 description: Set labels on all resources
 tags:
   - mutator
@@ -75,8 +75,8 @@ hidden: false
 		t.Fatalf("ParseMetadata returned unexpected error: %v", err)
 	}
 
-	if m.Image != "gcr.io/kpt-fn/set-labels:v0.1" {
-		t.Errorf("Image = %q, want %q", m.Image, "gcr.io/kpt-fn/set-labels:v0.1")
+	if m.Image != "ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1" {
+		t.Errorf("Image = %q, want %q", m.Image, "ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.1")
 	}
 	if m.Description != "Set labels on all resources" {
 		t.Errorf("Description = %q, want %q", m.Description, "Set labels on all resources")
@@ -139,10 +139,10 @@ func TestParseMetadata_PartialFields(t *testing.T) {
 	}{
 		{
 			name:  "only image field",
-			input: []byte("image: gcr.io/kpt-fn/my-func:v1\n"),
+			input: []byte("image: ghcr.io/kptdev/krm-functions-catalog/my-func:v1\n"),
 			validate: func(t *testing.T, m Metadata) {
-				if m.Image != "gcr.io/kpt-fn/my-func:v1" {
-					t.Errorf("Image = %q, want %q", m.Image, "gcr.io/kpt-fn/my-func:v1")
+				if m.Image != "ghcr.io/kptdev/krm-functions-catalog/my-func:v1" {
+					t.Errorf("Image = %q, want %q", m.Image, "ghcr.io/kptdev/krm-functions-catalog/my-func:v1")
 				}
 				if m.Description != "" {
 					t.Errorf("Description = %q, want empty", m.Description)
@@ -215,17 +215,17 @@ func TestParseMetadata_HiddenFieldPropagation(t *testing.T) {
 	}{
 		{
 			name:   "hidden true",
-			input:  []byte("image: gcr.io/kpt-fn/my-func:v1\nhidden: true\n"),
+			input:  []byte("image: ghcr.io/kptdev/krm-functions-catalog/my-func:v1\nhidden: true\n"),
 			hidden: true,
 		},
 		{
 			name:   "hidden false explicit",
-			input:  []byte("image: gcr.io/kpt-fn/my-func:v1\nhidden: false\n"),
+			input:  []byte("image: ghcr.io/kptdev/krm-functions-catalog/my-func:v1\nhidden: false\n"),
 			hidden: false,
 		},
 		{
 			name:   "hidden absent defaults to false",
-			input:  []byte("image: gcr.io/kpt-fn/my-func:v1\n"),
+			input:  []byte("image: ghcr.io/kptdev/krm-functions-catalog/my-func:v1\n"),
 			hidden: false,
 		},
 	}
