@@ -131,15 +131,15 @@ func TestProperty5_DocJSONContainsAllRequiredFields(t *testing.T) {
 		// Format a README with valid mdtogo markers.
 		readme := fmt.Sprintf(`<!--mdtogo:Short-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Examples-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 `, short, long, examples)
 
 		// Parse the README to get sections.
@@ -226,15 +226,15 @@ func TestProperty3_HelpOutputContainsParsedSections(t *testing.T) {
 		// Format a README with valid mdtogo markers.
 		readme := fmt.Sprintf(`<!--mdtogo:Short-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Examples-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 `, short, long, examples)
 
 		// Parse the README to get sections (same as runtime would).

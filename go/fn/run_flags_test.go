@@ -135,15 +135,15 @@ func TestAsMain_HelpFlag_WithDocs(t *testing.T) {
 
 	readme := []byte(`<!--mdtogo:Short-->
 Set labels on resources
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 The set-labels function adds labels to all resources.
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Examples-->
   kpt fn eval --image set-labels:v0.1
-<!--mdtogo:End-->
+<!--mdtogo-->
 `)
 	meta := []byte(`image: gcr.io/kpt-fn/set-labels:v0.1
 description: Set labels on all resources
@@ -167,11 +167,11 @@ func TestAsMain_DocFlag_OutputsValidJSON(t *testing.T) {
 
 	readme := []byte(`<!--mdtogo:Short-->
 Set labels
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 Long description here.
-<!--mdtogo:End-->
+<!--mdtogo-->
 `)
 	meta := []byte(`image: gcr.io/kpt-fn/set-labels:v0.1
 description: Set labels on all resources
@@ -220,7 +220,7 @@ func TestAsMain_DocFlag_HiddenField(t *testing.T) {
 
 	readme := []byte(`<!--mdtogo:Short-->
 Hidden function
-<!--mdtogo:End-->
+<!--mdtogo-->
 `)
 	meta := []byte(`image: gcr.io/kpt-fn/hidden-fn:v0.1
 description: A hidden function
@@ -248,7 +248,7 @@ func TestAsMain_DocFlag_InvalidMetadataYAML(t *testing.T) {
 
 	readme := []byte(`<!--mdtogo:Short-->
 My function
-<!--mdtogo:End-->
+<!--mdtogo-->
 `)
 	invalidMeta := []byte(`{{{not valid yaml at all!!!`)
 
@@ -285,11 +285,11 @@ func TestAsMain_HelpFlag_InvalidMetadataYAML(t *testing.T) {
 
 	readme := []byte(`<!--mdtogo:Short-->
 My function short desc
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 Detailed description of the function.
-<!--mdtogo:End-->
+<!--mdtogo-->
 `)
 	// Use YAML that actually fails to parse (unclosed flow mapping)
 	invalidMeta := []byte(`{{{not valid yaml at all!!!`)

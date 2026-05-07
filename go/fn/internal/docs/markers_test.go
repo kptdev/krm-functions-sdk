@@ -46,15 +46,15 @@ func genSectionContent() *rapid.Generator[string] {
 func formatMarkedREADME(short, long, examples string) string {
 	return fmt.Sprintf(`<!--mdtogo:Short-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Long-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 
 <!--mdtogo:Examples-->
 %s
-<!--mdtogo:End-->
+<!--mdtogo-->
 `, short, long, examples)
 }
 

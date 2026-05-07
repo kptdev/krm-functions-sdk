@@ -27,7 +27,7 @@ const (
 	markerShort    = "<!--mdtogo:Short-->"
 	markerLong     = "<!--mdtogo:Long-->"
 	markerExamples = "<!--mdtogo:Examples-->"
-	markerEnd      = "<!--mdtogo:End-->"
+	markerEnd      = "<!--mdtogo-->"
 )
 
 // ParseMarkers extracts mdtogo marker sections from README content.
@@ -56,7 +56,7 @@ func ParseMarkers(readme []byte) Sections {
 }
 
 // extractSection finds text between the given start marker and the next
-// <!--mdtogo:End--> marker. Returns empty string if either marker is missing.
+// <!--mdtogo--> end marker. Returns empty string if either marker is missing.
 func extractSection(content, startMarker string) string {
 	startIdx := strings.Index(content, startMarker)
 	if startIdx < 0 {
