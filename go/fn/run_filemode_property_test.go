@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"pgregory.net/rapid"
@@ -41,11 +42,11 @@ func genKRMResource() *rapid.Generator[string] {
 		// Generate 1-3 data entries with YAML-safe values (alphanumeric only,
 		// no special characters that could be misinterpreted by the YAML parser).
 		numEntries := rapid.IntRange(1, 3).Draw(t, "numEntries")
-		dataLines := ""
-		for i := 0; i < numEntries; i++ {
+		var dataLines strings.Builder
+		for i := range numEntries {
 			key := rapid.StringMatching(`[a-z][a-z0-9]{1,8}`).Draw(t, fmt.Sprintf("key%d", i))
 			value := rapid.StringMatching(`[a-zA-Z0-9]{1,15}`).Draw(t, fmt.Sprintf("value%d", i))
-			dataLines += fmt.Sprintf("  %s: %s\n", key, value)
+			dataLines.WriteString(fmt.Sprintf("  %s: %s\n", key, value))
 		}
 		return fmt.Sprintf(`apiVersion: v1
 kind: ConfigMap
@@ -53,7 +54,7 @@ metadata:
   name: %s
   namespace: %s
 data:
-%s`, name, namespace, dataLines)
+%s`, name, namespace, dataLines.String())
 	})
 }
 
@@ -104,24 +105,25 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 
 		// --- STDIN mode path ---
 		// Assemble the same resources into a ResourceList YAML (as STDIN would provide).
-		stdinInput := "apiVersion: config.kubernetes.io/v1\nkind: ResourceList\nitems:\n"
+		var stdinInput strings.Builder
+		stdinInput.WriteString("apiVersion: config.kubernetes.io/v1\nkind: ResourceList\nitems:\n")
 		for _, res := range resources {
 			// Indent each resource line under items as a YAML list element.
-			stdinInput += "- "
+			stdinInput.WriteString("- ")
 			first := true
 			for _, line := range splitLines(res) {
 				if first {
-					stdinInput += line + "\n"
+					stdinInput.WriteString(line + "\n")
 					first = false
 				} else {
-					stdinInput += "  " + line + "\n"
+					stdinInput.WriteString("  " + line + "\n")
 				}
 			}
 		}
 
-		stdinOutput, err := Run(noopProc, []byte(stdinInput))
+		stdinOutput, err := Run(noopProc, []byte(stdinInput.String()))
 		if err != nil {
-			t.Fatalf("STDIN mode Run failed: %v\n  Input:\n%s", err, stdinInput)
+			t.Fatalf("STDIN mode Run failed: %v\n  Input:\n%s", err, stdinInput.String())
 		}
 
 		// --- Compare outputs ---

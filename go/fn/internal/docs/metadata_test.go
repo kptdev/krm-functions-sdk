@@ -18,8 +18,8 @@ import (
 	"reflect"
 	"testing"
 
-	"pgregory.net/rapid"
 	"go.yaml.in/yaml/v3"
+	"pgregory.net/rapid"
 )
 
 // Feature: sdk-alignment, Property 2: Metadata YAML round-trip

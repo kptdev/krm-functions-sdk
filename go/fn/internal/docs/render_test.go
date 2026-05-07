@@ -400,7 +400,7 @@ func TestRenderDoc_EmptyInputs(t *testing.T) {
 	}
 
 	// Verify output is valid JSON.
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &raw); err != nil {
 		t.Fatalf("output is not valid JSON: %v\nRaw: %s", err, buf.String())
 	}
@@ -443,7 +443,7 @@ func TestRenderDoc_HiddenFieldSerialization(t *testing.T) {
 	}
 
 	// Verify the raw JSON contains "hidden": true.
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &raw); err != nil {
 		t.Fatalf("output is not valid JSON: %v\nRaw: %s", err, buf.String())
 	}

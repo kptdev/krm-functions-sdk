@@ -65,12 +65,12 @@ func extractSection(content, startMarker string) string {
 	afterStart := startIdx + len(startMarker)
 	remaining := content[afterStart:]
 
-	endIdx := strings.Index(remaining, markerEnd)
-	if endIdx < 0 {
+	before, _, ok := strings.Cut(remaining, markerEnd)
+	if !ok {
 		return ""
 	}
 
-	return strings.TrimSpace(remaining[:endIdx])
+	return strings.TrimSpace(before)
 }
 
 // hasAnyMarker reports whether the content contains any mdtogo marker.
