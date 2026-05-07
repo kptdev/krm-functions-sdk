@@ -40,7 +40,7 @@ data:
   key1: value1
 `
 	filePath := filepath.Join(tmpDir, "configmap.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0600))
 
 	// Set os.Args to simulate file mode invocation.
 	setArgs(t, []string{"cmd", filePath})
@@ -81,8 +81,8 @@ data:
 `
 	file1 := filepath.Join(tmpDir, "cm1.yaml")
 	file2 := filepath.Join(tmpDir, "cm2.yaml")
-	require.NoError(t, os.WriteFile(file1, []byte(cm1), 0644))
-	require.NoError(t, os.WriteFile(file2, []byte(cm2), 0644))
+	require.NoError(t, os.WriteFile(file1, []byte(cm1), 0600))
+	require.NoError(t, os.WriteFile(file2, []byte(cm2), 0600))
 
 	setArgs(t, []string{"cmd", file1, file2})
 
@@ -120,7 +120,7 @@ func TestFileMode_InvalidYAML(t *testing.T) {
 
 	invalidYAML := `{{{this is not valid YAML at all!!!`
 	filePath := filepath.Join(tmpDir, "invalid.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(invalidYAML), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(invalidYAML), 0600))
 
 	setArgs(t, []string{"cmd", filePath})
 
@@ -138,7 +138,7 @@ func TestFileMode_EmptyFile(t *testing.T) {
 
 	// Write an empty file.
 	filePath := filepath.Join(tmpDir, "empty.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(""), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(""), 0600))
 
 	setArgs(t, []string{"cmd", filePath})
 
@@ -159,7 +159,7 @@ func TestFileMode_WhitespaceOnlyFile(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	filePath := filepath.Join(tmpDir, "whitespace.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte("   \n\n  \t  \n"), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte("   \n\n  \t  \n"), 0600))
 
 	setArgs(t, []string{"cmd", filePath})
 
@@ -186,7 +186,7 @@ data:
   hello: world
 `
 	filePath := filepath.Join(tmpDir, "resource.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0600))
 
 	setArgs(t, []string{"cmd", filePath})
 
@@ -221,7 +221,7 @@ data:
   key: value
 `
 	filePath := filepath.Join(tmpDir, "cm.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0600))
 
 	rl, err := readFilesAsResourceList([]string{filePath})
 	require.NoError(t, err)
@@ -254,7 +254,7 @@ func TestReadFilesAsResourceList_InvalidYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	filePath := filepath.Join(tmpDir, "bad.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(`{{{not yaml`), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(`{{{not yaml`), 0600))
 
 	rl, err := readFilesAsResourceList([]string{filePath})
 	require.Error(t, err)
@@ -269,7 +269,7 @@ func TestReadFilesAsResourceList_EmptyFile(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	filePath := filepath.Join(tmpDir, "empty.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(""), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(""), 0600))
 
 	rl, err := readFilesAsResourceList([]string{filePath})
 	require.NoError(t, err)
@@ -299,7 +299,7 @@ metadata:
   namespace: default
 `
 	filePath := filepath.Join(tmpDir, "multi.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(multiDoc), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(multiDoc), 0600))
 
 	rl, err := readFilesAsResourceList([]string{filePath})
 	require.NoError(t, err)
@@ -326,7 +326,7 @@ metadata:
   namespace: default
 `
 	filePath := filepath.Join(tmpDir, "cm.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0600))
 
 	// Use a processor that adds a label to all items.
 	labelProc := ResourceListProcessorFunc(func(rl *ResourceList) (bool, error) {
@@ -356,7 +356,7 @@ func TestFileMode_HelpTakesPrecedence(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	filePath := filepath.Join(tmpDir, "cm.yaml")
-	require.NoError(t, os.WriteFile(filePath, []byte("apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: test\n"), 0644))
+	require.NoError(t, os.WriteFile(filePath, []byte("apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: test\n"), 0600))
 
 	setArgs(t, []string{"cmd", "--help", filePath})
 
@@ -383,8 +383,8 @@ metadata:
 `
 	validFile := filepath.Join(tmpDir, "valid.yaml")
 	emptyFile := filepath.Join(tmpDir, "empty.yaml")
-	require.NoError(t, os.WriteFile(validFile, []byte(configMap), 0644))
-	require.NoError(t, os.WriteFile(emptyFile, []byte(""), 0644))
+	require.NoError(t, os.WriteFile(validFile, []byte(configMap), 0600))
+	require.NoError(t, os.WriteFile(emptyFile, []byte(""), 0600))
 
 	setArgs(t, []string{"cmd", emptyFile, validFile})
 
@@ -412,7 +412,7 @@ func TestFileMode_NonExistentAmongValid(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	validFile := filepath.Join(tmpDir, "valid.yaml")
-	require.NoError(t, os.WriteFile(validFile, []byte("apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: test\n"), 0644))
+	require.NoError(t, os.WriteFile(validFile, []byte("apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: test\n"), 0600))
 
 	nonExistent := filepath.Join(tmpDir, "missing.yaml")
 

@@ -78,7 +78,7 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 		var filePaths []string
 		for i, res := range resources {
 			path := filepath.Join(tmpDir, fmt.Sprintf("resource-%d.yaml", i))
-			if err := os.WriteFile(path, []byte(res), 0644); err != nil {
+			if err := os.WriteFile(path, []byte(res), 0600); err != nil {
 				t.Fatalf("failed to write temp file: %v", err)
 			}
 			filePaths = append(filePaths, path)
