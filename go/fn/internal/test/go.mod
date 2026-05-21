@@ -2,7 +2,7 @@ module github.com/kptdev/krm-functions-sdk/go/fn/internal_test
 
 go 1.26.3
 
-replace github.com/kptdev/krm-functions-sdk/go/fn v0.0.0 => ../..
+replace github.com/kptdev/krm-functions-sdk/go/fn => ../..
 
 require (
 	github.com/kptdev/krm-functions-sdk/go/fn v1.0.2
@@ -33,7 +33,6 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.26.0 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kptdev/kpt v1.0.0-beta.63 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
@@ -54,8 +53,6 @@ require (
 	k8s.io/kube-openapi v0.0.0-20260520065146-aa012df4f4af // indirect
 	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
-	sigs.k8s.io/kustomize/api v0.21.1 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.0 // indirect
-	sigs.k8s.io/yaml v1.6.0 // indirect
 )
