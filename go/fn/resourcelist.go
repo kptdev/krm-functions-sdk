@@ -179,7 +179,7 @@ func (rl *ResourceList) toYNode() (*yaml.Node, error) {
 			return nil, err
 		}
 	}
-	if !rl.FunctionConfig.IsEmpty() {
+	if rl.FunctionConfig != nil && !rl.FunctionConfig.IsEmpty() {
 		if err := reMap.SetNestedMap(rl.FunctionConfig.node(), "functionConfig"); err != nil {
 			return nil, err
 		}

@@ -15,9 +15,12 @@
 package fn
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
+	"sigs.k8s.io/kustomize/kyaml/kio"
 )
 
 var dupResourceInput = []byte(`
@@ -77,4 +80,25 @@ results:
 	if !cmp.Equal(expected, rl.Results) {
 		t.Fatalf("unexpected diff: %v", cmp.Diff(expected, rl.Results))
 	}
+}
+
+func TestParseZeroBytesResourceList(t *testing.T) {
+	rl, err := ParseResourceList([]byte{})
+	require.NoError(t, err)
+	require.NotNil(t, rl)
+}
+
+// This caused a panic before
+func TestEmptyToYAML(t *testing.T) {
+	rl := &ResourceList{}
+
+	var out []byte
+	var err error
+	require.NotPanics(t, func() {
+		out, err = rl.ToYAML()
+	})
+
+	require.NoError(t, err)
+	expected := fmt.Sprintf("apiVersion: %s\nkind: %s\n", kio.ResourceListAPIVersion, kio.ResourceListKind)
+	require.Equal(t, expected, string(out))
 }

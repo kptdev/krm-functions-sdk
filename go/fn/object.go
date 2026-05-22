@@ -730,7 +730,7 @@ func IsMetaResource() func(*KubeObject) bool {
 }
 
 func (o *KubeObject) IsEmpty() bool {
-	return yaml.IsYNodeEmptyMap(o.obj.Node())
+	return o == nil || o.obj == nil || yaml.IsYNodeEmptyMap(o.obj.Node())
 }
 
 func NewEmptyKubeObject() *KubeObject {
