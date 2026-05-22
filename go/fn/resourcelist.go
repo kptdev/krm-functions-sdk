@@ -94,6 +94,9 @@ func ParseResourceList(in []byte) (*ResourceList, error) {
 
 	// handle empty input
 	if len(bytes.TrimSpace(in)) == 0 {
+		rl.Items = make(KubeObjects, 0)
+		rl.Results = make(Results, 0)
+		rl.FunctionConfig = NewEmptyKubeObject()
 		return rl, nil
 	}
 
