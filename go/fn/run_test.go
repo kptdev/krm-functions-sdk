@@ -30,6 +30,6 @@ func TestRunEmptyInputBytes(t *testing.T) {
 
 	output, err := Run(noOpFn, []byte{})
 	require.NoError(t, err)
-	expected := []byte(fmt.Sprintf("apiVersion: %s\nkind: %s\n", kio.ResourceListAPIVersion, kio.ResourceListKind))
+	expected := fmt.Appendf(nil, "apiVersion: %s\nkind: %s\n", kio.ResourceListAPIVersion, kio.ResourceListKind)
 	assert.Equal(t, expected, output)
 }
