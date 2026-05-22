@@ -16,6 +16,7 @@
 package fn
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"sort"
@@ -90,9 +91,15 @@ func CheckResourceDuplication(rl *ResourceList) error {
 // or KRM fn output
 func ParseResourceList(in []byte) (*ResourceList, error) {
 	rl := &ResourceList{}
+
+	// handle empty input
+	if len(bytes.TrimSpace(in)) == 0 {
+		return rl, nil
+	}
+
 	rlObj, err := ParseKubeObject(in)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse input bytes: %w", err)
+		return nil, fmt.Errorf("failed to parse ResourceList as a single KubeObject: %w", err)
 	}
 	if rlObj.GetKind() != kio.ResourceListKind {
 		return nil, fmt.Errorf("input was of unexpected kind %q; expected ResourceList", rlObj.GetKind())
