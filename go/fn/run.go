@@ -75,11 +75,13 @@ func AsMain(input any, opts ...Option) error {
 	}
 
 	// Collect non-flag positional arguments (file paths).
+	// Skip any argument that looks like a flag (starts with "-" or "--").
 	var filePaths []string
 	for _, arg := range os.Args[1:] {
-		if !strings.HasPrefix(arg, "--") {
-			filePaths = append(filePaths, arg)
+		if strings.HasPrefix(arg, "-") {
+			continue
 		}
+		filePaths = append(filePaths, arg)
 	}
 
 	err := func() error {
