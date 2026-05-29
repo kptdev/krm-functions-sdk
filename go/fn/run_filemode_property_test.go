@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,14 +23,6 @@ import (
 
 	"pgregory.net/rapid"
 )
-
-// Feature: sdk-alignment, Property 6: File mode equivalence
-//
-// For any valid set of KRM YAML resources, processing them via standalone file
-// mode SHALL produce identical output to processing the same resources assembled
-// into a ResourceList via STDIN mode.
-//
-// Validates: Requirements 4.4
 
 // genKRMResource generates a valid KRM YAML resource (a ConfigMap) with random
 // name and namespace. ConfigMaps are used because they are simple, always valid

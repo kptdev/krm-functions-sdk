@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,13 +22,9 @@ import (
 	"pgregory.net/rapid"
 )
 
-// Feature: sdk-alignment, Property 1: Marker parser round-trip
-//
 // For any three strings (short, long, examples), formatting them into a README
 // with mdtogo markers and then parsing that README with ParseMarkers SHALL
 // produce a Sections struct with fields equal to the original strings (after trimming).
-//
-// Validates: Requirements 6.1, 6.2, 6.3, 6.5, 5.2
 
 // genSectionContent generates arbitrary non-empty strings that do not contain
 // mdtogo markers (which would confuse the parser).
@@ -57,14 +53,6 @@ func formatMarkedREADME(short, long, examples string) string {
 <!--mdtogo-->
 `, short, long, examples)
 }
-
-// Feature: sdk-alignment, Property 7: Missing markers fallback
-//
-// For any README content that does NOT contain mdtogo markers, ParseMarkers
-// SHALL return empty strings for Short and Examples, and the full content
-// (trimmed) as Long.
-//
-// Validates: Requirements 5.4, 6.4
 
 // genNoMarkerContent generates arbitrary strings guaranteed not to contain
 // any mdtogo marker substrings.
