@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,14 +24,6 @@ import (
 	"pgregory.net/rapid"
 )
 
-// Feature: sdk-alignment, Property 3: Help output contains parsed sections
-//
-// For any README content containing valid mdtogo markers, the output of
-// RenderHelp SHALL contain the Short, Long, and Examples text extracted
-// by ParseMarkers.
-//
-// Validates: Requirements 2.2, 15.1
-
 // genNonEmptySectionContent generates arbitrary non-empty strings that do not
 // contain mdtogo markers or newlines that would break containment checks.
 func genNonEmptySectionContent() *rapid.Generator[string] {
@@ -48,13 +40,6 @@ func genNonEmptySectionContent() *rapid.Generator[string] {
 		return s
 	})
 }
-
-// Feature: sdk-alignment, Property 4: Help output excludes cobra boilerplate
-//
-// For any README content (with or without markers) and any metadata, the output
-// of RenderHelp SHALL NOT contain the strings "Usage:" or "Flags:".
-//
-// Validates: Requirements 2.4, 15.2, 15.3
 
 // genArbitrarySectionContent generates arbitrary strings (possibly empty) for
 // use in property tests that don't require non-empty content.
@@ -111,15 +96,6 @@ func TestProperty4_HelpOutputExcludesCobraBoilerplate(t *testing.T) {
 		}
 	})
 }
-
-// Feature: sdk-alignment, Property 5: Doc JSON contains all required fields from sources
-//
-// For any valid README content with markers and valid metadata YAML, the JSON
-// output of RenderDoc SHALL include non-empty values for short, long, examples
-// (from README) and image, description, tags, sourceURL, examplePackageURLs,
-// license (from metadata) when those source values are non-empty.
-//
-// Validates: Requirements 3.2, 3.4
 
 func TestProperty5_DocJSONContainsAllRequiredFields(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {

@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ license: Apache-2.0
 		assert.NoError(t, err, "--doc should return nil (exit 0)")
 	})
 
-	// Verify it's valid JSON
+	// Verify that it is a valid JSON
 	var docOutput docs.DocOutput
 	err := json.Unmarshal([]byte(output), &docOutput)
 	require.NoError(t, err, "--doc output should be valid JSON")

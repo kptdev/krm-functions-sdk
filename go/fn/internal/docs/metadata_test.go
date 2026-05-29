@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,8 @@ import (
 	"pgregory.net/rapid"
 )
 
-// Feature: sdk-alignment, Property 2: Metadata YAML round-trip
-//
-// For any valid Metadata struct, serializing it to YAML and then calling
-// ParseMetadata on the result SHALL produce an equivalent Metadata struct.
-//
-// Validates: Requirements 5.3
-
 // genSafeString generates simple alphanumeric strings suitable for YAML values
-// that won't cause quoting or escaping issues.
+// that will not cause quoting or escaping issues.
 func genSafeString() *rapid.Generator[string] {
 	return rapid.StringMatching(`[a-zA-Z0-9][a-zA-Z0-9 ./_-]{0,50}`)
 }
@@ -108,7 +101,7 @@ func TestParseMetadata_InvalidYAML(t *testing.T) {
 			input: []byte("tags:\n- valid\n bad: [unbalanced"),
 		},
 		{
-			name:  "invalid YAML with tabs in wrong places",
+			name:  "invalid YAML with tabs in the wrong places",
 			input: []byte(":\n\t- :\n\t\t- [[["),
 		},
 		{
