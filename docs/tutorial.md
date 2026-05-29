@@ -1,7 +1,7 @@
 # Tutorial: Developing a KRM Function
 
 This tutorial walks through the end-to-end workflow for building a KRM function
-using the Go SDK. By the end, you'll have a working function with embedded
+using the Go SDK. By the end, you will have a working function with embedded
 documentation, golden tests, and support for `--help`, `--doc`, and standalone
 file mode.
 
@@ -17,7 +17,7 @@ type Runner interface {
 }
 ```
 
-Here's a minimal function that sets labels on all resources:
+Here is a minimal function that sets labels on all the resources:
 
 ```go
 package main

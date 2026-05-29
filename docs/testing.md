@@ -5,7 +5,7 @@ testing of KRM functions.
 
 ## Golden Test Pattern
 
-Golden tests compare function output against expected baseline files. This
+Golden tests compare the function output against the expected baseline files. This
 approach catches regressions and makes it easy to review output changes.
 
 ### Directory Structure
@@ -116,7 +116,7 @@ From your function's module root (where `go.mod` lives):
 go test ./...
 ```
 
-If the function output doesn't match `_expected.yaml`, the test fails with a
+If the function output does not match `_expected.yaml`, the test fails with a
 diff showing what changed. See [`go/get-started/`](../go/get-started/) for a
 complete working example.
 
@@ -132,7 +132,7 @@ This overwrites all `_expected.yaml` files with the actual output. Review the
 diffs in version control before committing.
 
 **Caution:** `WRITE_GOLDEN_OUTPUT` accepts whatever the function currently
-produces as "correct." If the function has a bug, you've just blessed buggy
+produces as "correct." If the function has a bug, you have just blessed buggy
 output. Golden tests verify *stability* (did the output change?), not
 *correctness* (is the output right?). Always review the diffs carefully.
 For correctness guarantees, complement golden tests with property-based tests
@@ -197,7 +197,7 @@ functionConfig:
 - Keep test cases focused — one behavior per test directory.
 - Use descriptive directory names (e.g., `empty-input`, `missing-namespace`, `multiple-resources`).
 - The `_fnconfig.yaml` can be empty if your function doesn't require configuration.
-- Golden tests catch unintentional formatting changes too, which helps maintain stable output.
+- Golden tests also catch unintentional formatting changes. This helps to maintain a stable output.
 
 ## End-to-End Testing
 
@@ -210,7 +210,7 @@ test runner at
 The e2e runner uses a different test structure (`.expected/` directories with
 `config.yaml`, `diff.patch`, `results.yaml`) and is used by the
 [krm-functions-catalog](https://github.com/kptdev/krm-functions-catalog) `tests/`
-directory to validate functions running inside containers against `kpt fn render`.
+directory to validate the functions running inside the containers against `kpt fn render`.
 
 ---
 

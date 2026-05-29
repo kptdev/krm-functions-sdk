@@ -77,7 +77,7 @@ func isMetadataEmpty(meta Metadata) bool {
 }
 
 // RenderDoc writes JSON-encoded DocOutput to w.
-// Returns error only if JSON encoding fails (shouldn't happen with these types).
+// Returns error only if JSON encoding fails (should not happen with these types).
 func RenderDoc(w io.Writer, sections Sections, meta Metadata) error {
 	out := DocOutput{
 		Short:              sections.Short,

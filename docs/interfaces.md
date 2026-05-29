@@ -1,7 +1,7 @@
 # Interfaces
 
-The SDK provides two interfaces for implementing KRM functions. Choose based on
-what your function needs to do.
+The SDK provides two interfaces for implementing KRM functions. Choose according
+to your function requirements.
 
 ## fn.Runner
 
@@ -16,7 +16,7 @@ type Runner interface {
 
 Characteristics:
 - The SDK automatically parses `functionConfig` into your struct's exported fields (via JSON tags).
-- You can **modify** existing items but cannot add or remove items from the slice.
+- You can **modify** existing items, but you cannot add or remove items from the slice.
 - Return `true` for success, `false` for failure.
 - Use `results` to report structured info/warning/error messages.
 
@@ -168,7 +168,7 @@ runner := fn.WithContext(context.Background(), &MyFunction{})
 // runner implements ResourceListProcessor and can be passed to fn.AsMain
 ```
 
-This wrapper handles:
+This wrapper handles the following:
 1. Parsing `functionConfig` into your struct fields
 2. Calling your `Run` method with the parsed context
 3. Collecting results and determining success/failure

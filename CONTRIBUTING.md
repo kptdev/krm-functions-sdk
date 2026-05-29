@@ -1,6 +1,6 @@
 # Contributing to krm-functions-sdk
 
-We'd love to accept your contributions to this project. There are just a few
+We would love to accept your contributions to this project. There are just a few
 small guidelines you need to follow.
 
 ## Developer Certificate of Origin (DCO)
@@ -30,11 +30,11 @@ All files should have the copyright notice.
 // limitations under the License.
 ```
 
-If the file has never been modified: use the creation year only
+If the file has never been modified: use the creation year only.
 
 * Example: `Copyright 2026 The kpt Authors`
 
-If the file has been modified: use a year range from creation to last modification
+If the file has been modified: use a year range from creation to last modification.
 
 * Example: `Copyright 2024-2026 The kpt Authors`
 
@@ -57,7 +57,7 @@ make tidy
 ```
 
 The CI script (`hack/ci-validate-go.sh`) runs `make go` and then checks that no
-files were modified. If CI fails with "files are not to date", run `make go`
+files have been modified. If the CI script fails with "files are not to date", run `make go`
 locally and commit the changes.
 
 ## Code reviews

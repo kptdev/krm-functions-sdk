@@ -6,11 +6,11 @@ and running containerized functions.
 ## Dockerfile
 
 The [krm-functions-catalog](https://github.com/kptdev/krm-functions-catalog)
-provides a shared Dockerfile at `build/docker/go/Dockerfile` that all catalog
+provides a shared Dockerfile at `build/docker/go/Dockerfile` that all the catalog
 functions use. It accepts `BUILDER_IMAGE` and `BASE_IMAGE` as build args.
 
 For standalone functions or local development, use a multi-stage build with a
-minimal base image. The function binary should be statically linked (no CGO) so
+minimal base image. The function binary should be statically linked (no CGO), so
 it can run on `scratch` or `distroless`:
 
 ```dockerfile
@@ -113,7 +113,7 @@ pipeline:
 ```
 
 Note: the image must be published and accessible from the machine running
-`kpt fn render`. For local development, build the image locally first and it
+`kpt fn render`. For local development, build the image locally first. It
 will be used from the local Docker cache without pulling.
 
 ## Tips

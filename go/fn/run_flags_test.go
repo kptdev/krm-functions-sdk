@@ -91,7 +91,7 @@ func setArgs(t *testing.T, args []string) {
 func TestAsMain_HelpFlag_ExitsZero(t *testing.T) {
 	setArgs(t, []string{"cmd", "--help"})
 
-	// Close stdin to prove it's not read — if AsMain tries to read STDIN,
+	// Close stdin to prove it is not read — if AsMain tries to read STDIN,
 	// it would get an error or EOF immediately.
 	origStdin := os.Stdin
 	r, w, err := os.Pipe()
@@ -185,7 +185,7 @@ license: Apache-2.0
 		assert.NoError(t, err, "--doc should return nil (exit 0)")
 	})
 
-	// Verify it's valid JSON
+	// Verify that it is a valid JSON
 	var docOutput docs.DocOutput
 	err := json.Unmarshal([]byte(output), &docOutput)
 	require.NoError(t, err, "--doc output should be valid JSON")
