@@ -142,8 +142,8 @@ func AsMain(input any, opts ...Option) error {
 // handleHelp renders help text to STDOUT based on registered docs.
 func handleHelp(cfg *mainConfig) error {
 	if cfg.readme == nil && cfg.metadata == nil {
-		_, _ = fmt.Fprint(os.Stdout, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
-		return nil
+		_, err := fmt.Fprint(os.Stdout, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
+		return err
 	}
 
 	sections := docs.ParseMarkers(cfg.readme)
@@ -153,15 +153,14 @@ func handleHelp(cfg *mainConfig) error {
 		meta = docs.Metadata{}
 	}
 
-	docs.RenderHelp(os.Stdout, sections, meta)
-	return nil
+	return docs.RenderHelp(os.Stdout, sections, meta)
 }
 
 // handleDoc renders JSON documentation to STDOUT based on registered docs.
 func handleDoc(cfg *mainConfig) error {
 	if cfg.readme == nil && cfg.metadata == nil {
-		_, _ = fmt.Fprint(os.Stdout, "{}")
-		return nil
+		_, err := fmt.Fprint(os.Stdout, "{}")
+		return err
 	}
 
 	sections := docs.ParseMarkers(cfg.readme)
@@ -184,12 +183,10 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 		FunctionConfig: NewEmptyKubeObject(),
 	}
 	for _, path := range paths {
-		data, err := os.ReadFile(filepath.Clean(path))
+		cleanPath := filepath.Clean(path)
+		data, err := os.ReadFile(cleanPath)
 		if err != nil {
-			if os.IsNotExist(err) {
-				return nil, fmt.Errorf("file not found: %s", path)
-			}
-			return nil, fmt.Errorf("failed to read file %s: %v", path, err)
+			return nil, fmt.Errorf("file %s: %w", path, err)
 		}
 		// Empty files are valid — proceed with no items from this file.
 		if len(strings.TrimSpace(string(data))) == 0 {
@@ -197,7 +194,7 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 		}
 		objects, err := ParseKubeObjects(data)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse KRM resources from %s: %v", path, err)
+			return nil, fmt.Errorf("failed to parse KRM resources from %s: %w", path, err)
 		}
 		for _, obj := range objects {
 			rl.Items = append(rl.Items, obj)

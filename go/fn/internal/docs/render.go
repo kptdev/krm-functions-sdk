@@ -40,29 +40,42 @@ type DocOutput struct {
 // RenderHelp writes formatted help text to w.
 // If sections are empty and metadata is zero-value, writes a minimal
 // "no documentation available" message.
-func RenderHelp(w io.Writer, sections Sections, meta Metadata) {
+// Returns the first write error encountered.
+func RenderHelp(w io.Writer, sections Sections, meta Metadata) error {
 	if sections.Short == "" && sections.Long == "" && sections.Examples == "" && isMetadataEmpty(meta) {
-		_, _ = fmt.Fprint(w, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
-		return
+		_, err := fmt.Fprint(w, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
+		return err
 	}
 
 	if sections.Short != "" {
-		_, _ = fmt.Fprintf(w, "%s\n", sections.Short)
+		if _, err := fmt.Fprintf(w, "%s\n", sections.Short); err != nil {
+			return err
+		}
 	}
 
 	if sections.Long != "" {
 		if sections.Short != "" {
-			_, _ = fmt.Fprint(w, "\n")
+			if _, err := fmt.Fprint(w, "\n"); err != nil {
+				return err
+			}
 		}
-		_, _ = fmt.Fprintf(w, "%s\n", sections.Long)
+		if _, err := fmt.Fprintf(w, "%s\n", sections.Long); err != nil {
+			return err
+		}
 	}
 
 	if sections.Examples != "" {
 		if sections.Short != "" || sections.Long != "" {
-			_, _ = fmt.Fprint(w, "\n")
+			if _, err := fmt.Fprint(w, "\n"); err != nil {
+				return err
+			}
 		}
-		_, _ = fmt.Fprintf(w, "Examples:\n%s\n", sections.Examples)
+		if _, err := fmt.Fprintf(w, "Examples:\n%s\n", sections.Examples); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // isMetadataEmpty reports whether all fields of meta are zero-value.

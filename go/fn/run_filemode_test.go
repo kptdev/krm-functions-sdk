@@ -108,7 +108,7 @@ func TestFileMode_NonExistentFile(t *testing.T) {
 
 	err := AsMain(noopProcessor)
 	require.Error(t, err, "non-existent file should return an error")
-	assert.Contains(t, err.Error(), "file not found")
+	assert.Contains(t, err.Error(), "no such file or directory")
 	assert.Contains(t, err.Error(), nonExistentPath, "error should include the file path")
 }
 
@@ -244,7 +244,7 @@ func TestReadFilesAsResourceList_NonExistentFile(t *testing.T) {
 	rl, err := readFilesAsResourceList([]string{nonExistentPath})
 	require.Error(t, err)
 	assert.Nil(t, rl)
-	assert.Contains(t, err.Error(), "file not found")
+	assert.Contains(t, err.Error(), "no such file or directory")
 	assert.Contains(t, err.Error(), nonExistentPath)
 }
 
@@ -422,7 +422,7 @@ func TestFileMode_NonExistentAmongValid(t *testing.T) {
 	captureStderr(t, func() {
 		err := AsMain(noopProcessor)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "file not found")
+		assert.Contains(t, err.Error(), "no such file or directory")
 		assert.Contains(t, err.Error(), strings.TrimPrefix(nonExistent, ""))
 	})
 }
