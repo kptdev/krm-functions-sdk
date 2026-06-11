@@ -44,13 +44,13 @@ func captureStdout(t *testing.T, fn func()) string {
 
 	fn()
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = origStdout
 
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, r)
 	require.NoError(t, err)
-	r.Close()
+	_ = r.Close()
 
 	return buf.String()
 }
@@ -66,13 +66,13 @@ func captureStderr(t *testing.T, fn func()) string {
 
 	fn()
 
-	w.Close()
+	_ = w.Close()
 	os.Stderr = origStderr
 
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, r)
 	require.NoError(t, err)
-	r.Close()
+	_ = r.Close()
 
 	return buf.String()
 }
@@ -96,11 +96,11 @@ func TestAsMain_HelpFlag_ExitsZero(t *testing.T) {
 	origStdin := os.Stdin
 	r, w, err := os.Pipe()
 	require.NoError(t, err)
-	w.Close() // Close write end immediately — reading would get EOF
+	_ = w.Close() // Close write end immediately — reading would get EOF
 	os.Stdin = r
 	t.Cleanup(func() {
 		os.Stdin = origStdin
-		r.Close()
+		_ = r.Close()
 	})
 
 	output := captureStdout(t, func() {

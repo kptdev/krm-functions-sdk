@@ -1,4 +1,4 @@
-// Copyright 2025 The kpt Authors
+// Copyright 2025-2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,26 +42,26 @@ type DocOutput struct {
 // "no documentation available" message.
 func RenderHelp(w io.Writer, sections Sections, meta Metadata) {
 	if sections.Short == "" && sections.Long == "" && sections.Examples == "" && isMetadataEmpty(meta) {
-		fmt.Fprint(w, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
+		_, _ = fmt.Fprint(w, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
 		return
 	}
 
 	if sections.Short != "" {
-		fmt.Fprintf(w, "%s\n", sections.Short)
+		_, _ = fmt.Fprintf(w, "%s\n", sections.Short)
 	}
 
 	if sections.Long != "" {
 		if sections.Short != "" {
-			fmt.Fprint(w, "\n")
+			_, _ = fmt.Fprint(w, "\n")
 		}
-		fmt.Fprintf(w, "%s\n", sections.Long)
+		_, _ = fmt.Fprintf(w, "%s\n", sections.Long)
 	}
 
 	if sections.Examples != "" {
 		if sections.Short != "" || sections.Long != "" {
-			fmt.Fprint(w, "\n")
+			_, _ = fmt.Fprint(w, "\n")
 		}
-		fmt.Fprintf(w, "Examples:\n%s\n", sections.Examples)
+		_, _ = fmt.Fprintf(w, "Examples:\n%s\n", sections.Examples)
 	}
 }
 

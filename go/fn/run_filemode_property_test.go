@@ -38,7 +38,7 @@ func genKRMResource() *rapid.Generator[string] {
 		for i := range numEntries {
 			key := rapid.StringMatching(`[a-z][a-z0-9]{1,8}`).Draw(t, fmt.Sprintf("key%d", i))
 			value := rapid.StringMatching(`[a-zA-Z0-9]{1,15}`).Draw(t, fmt.Sprintf("value%d", i))
-			dataLines.WriteString(fmt.Sprintf("  %s: %s\n", key, value))
+			fmt.Fprintf(&dataLines, "  %s: %s\n", key, value)
 		}
 		return fmt.Sprintf(`apiVersion: v1
 kind: ConfigMap
@@ -65,7 +65,7 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to create temp dir: %v", err)
 		}
-		defer os.RemoveAll(tmpDir)
+		defer func() { _ = os.RemoveAll(tmpDir) }()
 
 		var filePaths []string
 		for i, res := range resources {

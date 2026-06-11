@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -141,7 +142,7 @@ func AsMain(input any, opts ...Option) error {
 // handleHelp renders help text to STDOUT based on registered docs.
 func handleHelp(cfg *mainConfig) error {
 	if cfg.readme == nil && cfg.metadata == nil {
-		fmt.Fprint(os.Stdout, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
+		_, _ = fmt.Fprint(os.Stdout, "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n")
 		return nil
 	}
 
@@ -159,7 +160,7 @@ func handleHelp(cfg *mainConfig) error {
 // handleDoc renders JSON documentation to STDOUT based on registered docs.
 func handleDoc(cfg *mainConfig) error {
 	if cfg.readme == nil && cfg.metadata == nil {
-		fmt.Fprint(os.Stdout, "{}")
+		_, _ = fmt.Fprint(os.Stdout, "{}")
 		return nil
 	}
 
@@ -183,7 +184,7 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 		FunctionConfig: NewEmptyKubeObject(),
 	}
 	for _, path := range paths {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(filepath.Clean(path))
 		if err != nil {
 			if os.IsNotExist(err) {
 				return nil, fmt.Errorf("file not found: %s", path)

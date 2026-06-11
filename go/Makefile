@@ -25,7 +25,7 @@ lint: install-golangci-lint lint-modules
 lint-modules: $(MODULES)
 	@for f in $(^D); do \
 	(cd $$f; echo "Checking golangci-lint $$f"; \
-	$(GOBIN)/golangci-lint run ./...); \
+	$(GOBIN)/golangci-lint run ./...) || exit 1; \
 	done
 
 .PHONY: test
