@@ -1,9 +1,22 @@
+# Copyright 2026 The kpt Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+GOLANGCI_LINT_VERSION ?= 2.12.2
+
 .PHONY: all
 all: fix vet fmt test lint
 
-GOPATH := $(shell go env GOPATH)
-GOBIN := $(shell go env GOPATH)/bin
-OUT_DIR := .out
 MODULES = $(shell find . -name 'go.mod' -print)
 
 .PHONY: fix
@@ -14,18 +27,11 @@ fix: $(MODULES)
 fmt: $(MODULES)
 	@for f in $(^D); do (cd $$f; echo "Formatting $$f"; go fmt ./...); done
 
-.PHONY: install-golangci-lint
-install-golangci-lint:
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
-
 .PHONY: lint
-lint: install-golangci-lint lint-modules
-
-.PHONY: lint-modules
-lint-modules: $(MODULES)
+lint: $(MODULES)
 	@for f in $(^D); do \
-	(cd $$f; echo "Checking golangci-lint $$f"; \
-	$(GOBIN)/golangci-lint run ./...) || exit 1; \
+	(cd $$f; echo "Linting $$f"; \
+	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v$(GOLANGCI_LINT_VERSION) run ./...) || exit 1; \
 	done
 
 .PHONY: test
