@@ -208,6 +208,9 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 // Run evaluates the function. input must be a resourceList in yaml format. An
 // updated resourceList will be returned.
 func Run(p ResourceListProcessor, input []byte) ([]byte, error) {
+	if p == nil {
+		return nil, fmt.Errorf("nil ResourceListProcessor")
+	}
 	rl, err := ParseResourceList(input)
 	if err != nil {
 		return nil, err
