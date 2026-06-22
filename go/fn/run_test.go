@@ -60,6 +60,15 @@ func TestAsMainTypes(t *testing.T) {
 	t.Cleanup(func() { os.Args = oldArgs })
 	os.Args = []string{"cmd"}
 
+	oldStdin := os.Stdin
+	devNull, err := os.Open(os.DevNull)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		os.Stdin = oldStdin
+		_ = devNull.Close()
+	})
+	os.Stdin = devNull
+
 	testCases := map[string]any{
 		"ResourceListProcessor":              &myRLP{},
 		"Implicit ResourceListProcessorFunc": myRLPF,
