@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"pgregory.net/rapid"
 )
 
@@ -84,9 +85,7 @@ func TestProperty4_HelpOutputExcludesCobraBoilerplate(t *testing.T) {
 
 		// Render help output.
 		var buf bytes.Buffer
-		if err := RenderHelp(&buf, sections, meta); err != nil {
-			t.Errorf("RenderHelp failed: %v", err)
-		}
+		require.NoError(t, RenderHelp(&buf, sections, meta), "RenderHelp failed")
 		output := buf.String()
 
 		// Assert that the help output does NOT contain cobra-style boilerplate.
@@ -220,9 +219,7 @@ func TestProperty3_HelpOutputContainsParsedSections(t *testing.T) {
 
 		// Render help output.
 		var buf bytes.Buffer
-		if err := RenderHelp(&buf, sections, Metadata{}); err != nil {
-			t.Errorf("RenderHelp failed: %v", err)
-		}
+		require.NoError(t, RenderHelp(&buf, sections, Metadata{}), "RenderHelp failed")
 		output := buf.String()
 
 		// Assert that the help output contains each parsed section.
@@ -254,9 +251,7 @@ func TestRenderHelp_FullSectionsAndMetadata(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	if err := RenderHelp(&buf, sections, meta); err != nil {
-		t.Errorf("RenderHelp failed: %v", err)
-	}
+	require.NoError(t, RenderHelp(&buf, sections, meta), "RenderHelp failed")
 	output := buf.String()
 
 	// Verify output contains the Short description.
@@ -289,9 +284,7 @@ func TestRenderHelp_EmptySections(t *testing.T) {
 	meta := Metadata{}
 
 	var buf bytes.Buffer
-	if err := RenderHelp(&buf, sections, meta); err != nil {
-		t.Errorf("RenderHelp failed: %v", err)
-	}
+	require.NoError(t, RenderHelp(&buf, sections, meta), "RenderHelp failed")
 	output := buf.String()
 
 	expected := "No documentation available. Pass fn.WithDocs to fn.AsMain to enable --help.\n"

@@ -67,11 +67,11 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to create temp dir: %v", err)
 		}
-		defer func() {
+		t.Cleanup(func() {
 			if err := os.RemoveAll(tmpDir); err != nil {
 				t.Errorf("failed to remove temp dir %s: %v", tmpDir, err)
 			}
-		}()
+		})
 
 		var filePaths []string
 		for i, res := range resources {
