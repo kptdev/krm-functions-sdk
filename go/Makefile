@@ -30,7 +30,7 @@ lint-modules: $(MODULES)
 
 .PHONY: test
 test: $(MODULES)
-	@for f in $(^D); do (cd $$f; echo "Testing $$f"; go test ./...) || exit 1; done
+	@for f in $(^D); do (cd $$f; echo "Testing $$f"; go test -v ./...) || exit 1; done
 
 .PHONY: vet
 vet: $(MODULES)
