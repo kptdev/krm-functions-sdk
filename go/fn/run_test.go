@@ -64,7 +64,8 @@ func TestAsMainTypes(t *testing.T) {
 		"ResourceListProcessor":              &myRLP{},
 		"Implicit ResourceListProcessorFunc": myRLPF,
 		"Explicit ResourceListProcessorFunc": ResourceListProcessorFunc(myRLPF),
-		"runnerProcessor":                    runnerProcessor{ctx: t.Context(), fnRunner: &myFR{}},
+		"RunnerProcessor":                    runnerProcessor{ctx: t.Context(), fnRunner: &myFR{}},
+		"Anonymous":                          func(*ResourceList) (bool, error) { return true, nil },
 	}
 
 	for name, input := range testCases {

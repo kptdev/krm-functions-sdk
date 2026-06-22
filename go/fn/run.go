@@ -86,11 +86,12 @@ func AsMain(input any, opts ...Option) error {
 
 	err := func() error {
 		var p ResourceListProcessor
-		if cast, ok := input.(ResourceListProcessor); ok {
+		switch cast := input.(type) {
+		case ResourceListProcessor:
 			p = cast
-		} else if cast, ok := input.(func(*ResourceList) (bool, error)); ok {
+		case func(*ResourceList) (bool, error):
 			p = ResourceListProcessorFunc(cast)
-		} else {
+		default:
 			return fmt.Errorf("unknown input type %T", input)
 		}
 
