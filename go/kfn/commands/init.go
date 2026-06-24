@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022, 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ func (r *InitRunner) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (r *InitRunner) GetFnPackage() error {
-	cmd := exec.Command("kpt", "pkg", "get", r.FnPkgPath, r.FnName)
+	cmd := exec.Command("kpt", "pkg", "get", r.FnPkgPath, r.FnName) //nolint:gosec // CLI tool: args from user's own flags
 
 	var out, errout bytes.Buffer
 	cmd.Stdout = &out

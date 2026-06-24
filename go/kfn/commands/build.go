@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022, 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ const (
 	// Ko constant variables
 	KoDockerRepoEnvVar = "KO_DOCKER_REPO"
 	KoLocalRepo        = "ko.local"
+
+	build = "build"
 )
 
 func NewBuildRunner(ctx context.Context) *BuildRunner {
@@ -53,7 +55,7 @@ func NewBuildRunner(ctx context.Context) *BuildRunner {
 		Docker: &DockerBuilder{},
 	}
 	r.Command = &cobra.Command{
-		Use:   "build",
+		Use:   build,
 		Short: "build your KRM function to a container image",
 		RunE:  r.RunE,
 	}
@@ -114,7 +116,7 @@ func (r *BuildRunner) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (r *DockerBuilder) Build() error {
-	args := []string{"build", ".", "-f", r.DockerfilePath, "--tag", r.Image}
+	args := []string{build, ".", "-f", r.DockerfilePath, "--tag", r.Image}
 	err := execCmdFn(nil, "docker", args...)
 	if err != nil {
 		return err
@@ -157,7 +159,7 @@ func (r *DockerBuilder) createDockerfile() error {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(DockerfilePath, dockerfileContent, 0644); err != nil {
+	if err = os.WriteFile(DockerfilePath, dockerfileContent, 0600); err != nil {
 		return err
 	}
 	fmt.Println("created Dockerfile")
@@ -187,7 +189,7 @@ func (r *KoBuilder) GuaranteeKoInstalled() error {
 	return nil
 }
 func (r *KoBuilder) Build() error {
-	args := []string{"build", "-B", "--tags", r.Tag}
+	args := []string{build, "-B", "--tags", r.Tag}
 	envs := []string{KoDockerRepoEnvVar + "=" + r.Repo}
 	err := execCmdFn(envs, "ko", args...)
 	if err != nil {
@@ -219,7 +221,7 @@ func (r *KoBuilder) Validate() error {
 }
 
 func execCmd(envs []string, name string, args ...string) error {
-	cmd := exec.Command(name, args...)
+	cmd := exec.Command(name, args...) //nolint:gosec // CLI tool: args constructed internally from user's own flags
 	if len(envs) != 0 {
 		cmd.Env = os.Environ()
 		cmd.Env = append(cmd.Env, envs...)

@@ -117,7 +117,6 @@ func TestBuild(t *testing.T) {
 	}
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
-
 			r := NewBuildRunner(context.TODO())
 			execCmdFn = func(envs []string, name string, args ...string) error {
 				fakeExecCmd(t, test.cmdExpected, envs, name, args...)
