@@ -37,7 +37,6 @@ const (
 
 type ResourceIdentifier struct {
 	Group     string
-	Version   string
 	Kind      string
 	Name      string
 	Namespace string
