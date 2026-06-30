@@ -16,6 +16,7 @@ package fn
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,4 +33,54 @@ func TestRunEmptyInputBytes(t *testing.T) {
 	require.NoError(t, err)
 	expected := fmt.Appendf(nil, "apiVersion: %s\nkind: %s\n", kio.ResourceListAPIVersion, kio.ResourceListKind)
 	assert.Equal(t, expected, output)
+}
+
+type myRLP struct{}
+
+func (*myRLP) Process(*ResourceList) (bool, error) {
+	return true, nil
+}
+
+func myRLPF(*ResourceList) (bool, error) {
+	return true, nil
+}
+
+type myFR struct{}
+
+func (*myFR) Run(*Context, *KubeObject, KubeObjects, *Results) bool {
+	return true
+}
+
+var _ ResourceListProcessor = &myRLP{}
+var _ ResourceListProcessorFunc = myRLPF
+var _ Runner = &myFR{}
+
+func TestAsMainTypes(t *testing.T) {
+	oldArgs := os.Args
+	t.Cleanup(func() { os.Args = oldArgs })
+	os.Args = []string{"cmd"}
+
+	oldStdin := os.Stdin
+	devNull, err := os.Open(os.DevNull)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		os.Stdin = oldStdin
+		_ = devNull.Close()
+	})
+	os.Stdin = devNull
+
+	testCases := map[string]any{
+		"ResourceListProcessor":              &myRLP{},
+		"Implicit ResourceListProcessorFunc": myRLPF,
+		"Explicit ResourceListProcessorFunc": ResourceListProcessorFunc(myRLPF),
+		"RunnerProcessor":                    runnerProcessor{ctx: t.Context(), fnRunner: &myFR{}},
+		"Anonymous":                          func(*ResourceList) (bool, error) { return true, nil },
+	}
+
+	for name, input := range testCases {
+		t.Run(name, func(t *testing.T) {
+			err := AsMain(input)
+			assert.NoError(t, err)
+		})
+	}
 }

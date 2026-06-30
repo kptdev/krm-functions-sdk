@@ -10,3 +10,7 @@ GO_MOD_DIRS = $(shell find . -name 'go.mod' -exec sh -c 'echo \"$$(dirname "{}")
 .PHONY: tidy
 tidy:
 	@for f in $(GO_MOD_DIRS); do (cd $$f; echo "Tidying $$f"; go mod tidy) || exit 1; done
+
+.PHONY: test
+test:
+	make -C go test

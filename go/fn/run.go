@@ -87,11 +87,11 @@ func AsMain(input any, opts ...Option) error {
 
 	err := func() error {
 		var p ResourceListProcessor
-		switch input := input.(type) {
-		case runnerProcessor:
-			p = input
-		case ResourceListProcessorFunc:
-			p = input
+		switch cast := input.(type) {
+		case ResourceListProcessor:
+			p = cast
+		case func(*ResourceList) (bool, error):
+			p = ResourceListProcessorFunc(cast)
 		default:
 			return fmt.Errorf("unknown input type %T", input)
 		}
@@ -206,13 +206,8 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 // Run evaluates the function. input must be a resourceList in yaml format. An
 // updated resourceList will be returned.
 func Run(p ResourceListProcessor, input []byte) ([]byte, error) {
-	switch input := p.(type) {
-	case runnerProcessor:
-		p = input
-	case ResourceListProcessorFunc:
-		p = input
-	default:
-		return nil, fmt.Errorf("unknown input type %T", input)
+	if p == nil {
+		return nil, fmt.Errorf("nil ResourceListProcessor")
 	}
 	rl, err := ParseResourceList(input)
 	if err != nil {
