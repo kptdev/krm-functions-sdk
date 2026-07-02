@@ -4,10 +4,10 @@ go 1.26.3
 
 // NOTE: replace directive is for in-repo development only.
 // External consumers should use: require github.com/kptdev/krm-functions-sdk/go/fn v1.x.x
-replace github.com/kptdev/krm-functions-sdk/go/fn => ../
+//replace github.com/kptdev/krm-functions-sdk/go/fn => ../
 
 require (
-	github.com/kptdev/krm-functions-sdk/go/fn v1.0.0
+	github.com/kptdev/krm-functions-sdk/go/fn v1.0.4
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.36.1
 	sigs.k8s.io/kustomize/kyaml v0.21.1
