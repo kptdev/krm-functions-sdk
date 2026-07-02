@@ -21,8 +21,8 @@ import (
 	"reflect"
 	"sort"
 
+	schema "github.com/kptdev/kpt/api/schema/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
-	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	pkgerrors "github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"

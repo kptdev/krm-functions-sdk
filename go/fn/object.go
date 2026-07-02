@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"strings"
 
+	schema "github.com/kptdev/kpt/api/schema/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
-	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )

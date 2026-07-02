@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
+	schema "github.com/kptdev/kpt/api/schema/v1"
 )
 
 func WithContext(ctx context.Context, runner Runner) ResourceListProcessor {

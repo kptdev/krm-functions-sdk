@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"slices"
 
+	kptfileapi "github.com/kptdev/kpt/api/kptfile/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
-	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
 )
 
 type SubObjectMatcher func(obj *fn.SubObject) bool

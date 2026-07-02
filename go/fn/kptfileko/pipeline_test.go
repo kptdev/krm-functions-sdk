@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
+	kptfileapi "github.com/kptdev/kpt/api/kptfile/v1"
 )
 
 func TestUpsertMutatorFunctions(t *testing.T) {

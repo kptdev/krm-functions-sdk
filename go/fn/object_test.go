@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/google/go-cmp/cmp"
-	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
+	schema "github.com/kptdev/kpt/api/schema/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
