@@ -47,7 +47,7 @@ jobs:
     - name: Set up Go
       uses: kptdev/porch/.github/actions/setup-go-kpt@main
       with:
-        go-version-file: go/fn/go.mod
+        go-version-file: go/kfn/go.mod
         install-kpt: 'false'
         cache-dependency-path: go/**/go.sum
     - name: Build, Test, Lint
