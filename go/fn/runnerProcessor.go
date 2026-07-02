@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 )
 
 func WithContext(ctx context.Context, runner Runner) ResourceListProcessor {
@@ -105,10 +105,10 @@ func assignCMDataToFn(runner Runner, data map[string]string) error {
 		return fmt.Errorf("the ConfigMap is not of a struct, got %v", obj.Kind().String())
 	}
 	stringMap := reflect.MapOf(reflect.TypeFor[string](), reflect.TypeFor[string]())
-	for _, field := range obj.Fields() {
-		if field.Kind() == reflect.Map && field.Type() == stringMap {
-			if field.CanSet() {
-				field.Set(reflect.ValueOf(data))
+	for i := 0; i < obj.NumField(); i++ {
+		if obj.Field(i).Kind() == reflect.Map && obj.Field(i).Type() == stringMap {
+			if obj.Field(i).CanSet() {
+				obj.Field(i).Set(reflect.ValueOf(data))
 			}
 			return nil
 		}

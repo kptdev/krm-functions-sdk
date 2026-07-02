@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )

@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"strings"
 
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 

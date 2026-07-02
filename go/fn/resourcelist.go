@@ -22,8 +22,8 @@ import (
 	"sort"
 
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal"
+	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	pkgerrors "github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )

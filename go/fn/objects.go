@@ -19,8 +19,8 @@ import (
 	"math"
 	"strings"
 
-	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	"github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
+	"github.com/kptdev/krm-functions-sdk/go/fn/schema"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
