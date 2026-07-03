@@ -3,7 +3,7 @@ module github.com/kptdev/krm-functions-sdk/go/fn
 go 1.24.0
 
 // We must not include any core k8s APIs (e.g. k8s.io/api) in
-// the dependencies, depending on them will likely to cause version skew for
+// the dependencies, depending on them will likely cause version skew for
 // consumers. The dependencies for tests and examples should be isolated.
 
 require (

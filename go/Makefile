@@ -13,16 +13,28 @@
 # limitations under the License.
 
 GOLANGCI_LINT_VERSION ?= 2.12.2
+GOLANGCI_LINT_MODULE := github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
-# -omitzero was added in Go 1.26; omit the flag on older toolchains.
+# go fix gained -omitzero in Go 1.26; skip the flag on older toolchains.
+# awk is used instead of GNU sort -V so this works on macOS/BSD as well as Linux.
 GO_FIX_OMITZERO := $(shell \
-	v=$$(go env GOVERSION | sed 's/^go//'); \
-	[ "$$(printf '%s\n' 1.26 "$$v" | sort -V | head -n1)" = 1.26 ] && echo '-omitzero=false')
+	go_version=$$(go env GOVERSION | sed 's/^go//'); \
+	awk -v v="$$go_version" 'BEGIN { \
+		split(v, parts, "."); \
+		major = parts[1] + 0; \
+		match(parts[2], /^[0-9]+/); minor = substr(parts[2], RSTART, RLENGTH) + 0; \
+		if (major > 1 || (major == 1 && minor >= 26)) print "-omitzero=false"; \
+	}')
 
+# Use a locally installed golangci-lint when it matches the pinned version;
+# otherwise run the pinned release via "go run".
 GOLANGCI_LINT_COMMAND := $(shell \
 	if command -v golangci-lint >/dev/null 2>&1 && \
-	  golangci-lint version --short 2>/dev/null | grep -qx "$(GOLANGCI_LINT_VERSION)"; then echo "golangci-lint"; \
-	else echo "go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v$(GOLANGCI_LINT_VERSION)"; fi)
+	   [ "$$(golangci-lint version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]; then \
+		echo golangci-lint; \
+	else \
+		echo "go run $(GOLANGCI_LINT_MODULE)@v$(GOLANGCI_LINT_VERSION)"; \
+	fi)
 
 .PHONY: all
 all: fix vet fmt test lint
