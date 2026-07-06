@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
+	kptfileapi "github.com/kptdev/kpt/api/kptfile/v1"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/assert"
 )

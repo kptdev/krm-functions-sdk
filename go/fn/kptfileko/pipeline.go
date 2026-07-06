@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"slices"
 
+	kptfileapi "github.com/kptdev/kpt/api/kptfile/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
-	kptfileapi "github.com/kptdev/krm-functions-sdk/go/fn/kptfileapi"
 )
 
 // UpsertMutatorFunctions ensures that the given KRM functions are added to or updated in the Kptfile's mutators list.

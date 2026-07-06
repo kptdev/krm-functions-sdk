@@ -21,9 +21,9 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/google/go-cmp/cmp"
+	schema "github.com/kptdev/kpt/api/schema/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func TestIsGVK(t *testing.T) {
