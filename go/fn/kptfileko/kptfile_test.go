@@ -296,3 +296,108 @@ status: {conditions: [{type: test, status: "True", message: Everything is awesom
 		})
 	}
 }
+
+func TestClearStatus(t *testing.T) {
+	testcases := []struct {
+		name            string
+		resources       map[string]string
+		expectedKptfile string
+	}{
+		{
+			name: "remove null status field",
+			resources: map[string]string{
+				"Kptfile": `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+status:`,
+			},
+			expectedKptfile: `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example`,
+		},
+		{
+			name: "remove empty status field",
+			resources: map[string]string{
+				"Kptfile": `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+status: {}`,
+			},
+			expectedKptfile: `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example`,
+		},
+		{
+			name: "remove bad status field",
+			resources: map[string]string{
+				"Kptfile": `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+status: bad`,
+			},
+			expectedKptfile: `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example`,
+		},
+		{
+			name: "update existing half-empty condition",
+			resources: map[string]string{
+				"Kptfile": `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+status:
+  conditions:
+  - type: test`,
+			},
+			expectedKptfile: `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example`,
+		},
+		{
+			name: "updating existing condition (one line)",
+			resources: map[string]string{
+				"Kptfile": `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example
+status: {conditions: [{type: test, status: "False", message: Everything is NOT awesome!, reason: TestFailed}]}`,
+			},
+			expectedKptfile: `
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: example`,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			kptfile, err := NewFromPackage(tc.resources)
+			assert.NilError(t, err, "failed to parse Kptfile")
+
+			err = kptfile.ClearStatus()
+			assert.NilError(t, err, "failed to clear status")
+
+			err = kptfile.WriteToPackage(tc.resources)
+			assert.NilError(t, err, "failed to write conditions back to Kptfile")
+			assert.Equal(t, strings.TrimSpace(tc.expectedKptfile), strings.TrimSpace(tc.resources["Kptfile"]))
+		})
+	}
+}

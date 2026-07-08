@@ -20,6 +20,7 @@ import (
 
 	kptfileapi "github.com/kptdev/kpt/api/kptfile/v1"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
+	pkgerrors "github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -95,6 +96,14 @@ func (kf *KptfileKubeObject) String() string {
 // If the Status field doesn't exist, it is added.
 func (kf *KptfileKubeObject) Status() *fn.SubObject {
 	return kf.UpsertMap("status")
+}
+
+// ClearStatus removes the status field from the KptfileKubeObject.
+func (kf *KptfileKubeObject) ClearStatus() error {
+	if _, err := kf.RemoveNestedField("status"); err != nil {
+		return pkgerrors.Wrap(err, "failed to remove status field from Kptfile")
+	}
+	return nil
 }
 
 // DecodeKptfile decodes a KptFile from a YAML string.
