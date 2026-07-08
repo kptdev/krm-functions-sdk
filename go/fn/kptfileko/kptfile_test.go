@@ -297,7 +297,7 @@ status: {conditions: [{type: test, status: "True", message: Everything is awesom
 	}
 }
 
-func TestRemoveStatus(t *testing.T) {
+func TestClearStatus(t *testing.T) {
 	testcases := []struct {
 		name            string
 		resources       map[string]string
