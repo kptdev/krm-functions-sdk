@@ -81,6 +81,10 @@ See [Interfaces](docs/interfaces.md) for details and code examples.
 - [Testing](docs/testing.md) — golden test patterns
 - [Containerizing](docs/containerizing.md) — building and running function images
 
+## Versioning
+
+This project follows the [kpt project versioning guidelines](https://github.com/kptdev/governance/blob/main/VERSIONING.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on DCO sign-off, copyright headers, and code review process.
