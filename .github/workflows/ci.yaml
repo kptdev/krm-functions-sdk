@@ -45,7 +45,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Set up Go
-      uses: kptdev/porch/.github/actions/setup-go-kpt@main
+      uses: kptdev/kpt/.github/actions/setup-go-kpt@main
       with:
         go-version-file: go/kfn/go.mod
         install-kpt: 'false'
