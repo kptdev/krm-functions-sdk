@@ -1,0 +1,21 @@
+apiVersion: config.kubernetes.io/v1
+kind: ResourceList
+items:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: example
+    annotations:
+      example.kpt.dev/greeting: Hello, world!
+  data:
+    key: value
+functionConfig:
+  apiVersion: fn.kpt.dev/v1alpha1
+  kind: HelloWorld
+  metadata:
+    name: test
+  greeting: Hello
+  name: world
+results:
+- message: greeted 1 resource(s) with "Hello, world!"
+  severity: info

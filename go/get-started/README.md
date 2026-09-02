@@ -1,4 +1,4 @@
-# some-function-name
+# hello-world
 
 Note: Please ensure you follow the [kpt doc style guide].
 
@@ -6,16 +6,14 @@ Note: Please ensure you follow the [kpt doc style guide].
 
 <!--mdtogo:Short-->
 
-Explain what this function does in one or two sentences.
+A "hello world" example KRM function built with the Go SDK.
 
 <!--mdtogo-->
 
-Describe why the user should care about this function.
-
-What problem does it solve?
-
-Provide some context (e.g. In the `gatekeeper` function, explain what's
-is `Gatekeeper` project)
+This is the get-started example for the KRM Functions Go SDK. It is a small,
+working mutator function that builds a greeting from its functionConfig and
+stamps it as an annotation (`example.kpt.dev/greeting`) on every resource it
+receives. Copy this directory as the starting point for your own function.
 
 [//]: <> (Note: The content between `<!--mdtogo:Short-->` and the following
 `<!--mdtogo-->` will be used as the short description for the command.)
@@ -24,23 +22,27 @@ is `Gatekeeper` project)
 
 ## Usage
 
-How do I use this function?
-
-Explain what does it do in details.
-
-Is this function meant to be used declaratively, imperatively or both?
+The function reads a `HelloWorld` functionConfig, forms the message
+`"<greeting>, <name>!"`, and sets it as the `example.kpt.dev/greeting`
+annotation on every resource in the package. It runs as a mutator in a `kpt`
+pipeline or standalone (STDIN/STDOUT, file mode, `--help`, `--doc`).
 
 ### FunctionConfig
 
-Omit this section, if the function doesn't support any `functionConfigs`.
-Otherwise, explain the function config and behavior for this function in detail.
-For each field in the function config, specify:
+The functionConfig `kind` matches the Go struct name (`HelloWorld`). Each field
+is populated from the matching key via its JSON tag.
 
-- An example value
-- Whether it is optional, and if so, the default value
+```yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: HelloWorld
+metadata:
+  name: my-config
+greeting: Hello
+name: world
+```
 
-If showing the function orchestrator (e.g. kpt) can make it clear about how to
-use the function, it's recommended to use it.
+- `greeting` (optional): the salutation. Defaults to `Hello`.
+- `name` (optional): who to greet. Defaults to `world`.
 
 [//]: <> (Note: The content between `<!--mdtogo:Long-->` and the following
 `<!--mdtogo-->` will be used as the long description for the command.)
@@ -51,10 +53,21 @@ use the function, it's recommended to use it.
 
 <!--mdtogo:Examples-->
 
-Omit this section if you are providing complete example kpt packages which are
-linked from the catalog site.
+Greet every resource with the default `Hello, world!`:
 
-Otherwise, provide inline examples in this section.
+```yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: HelloWorld
+```
+
+Customize the greeting:
+
+```yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: HelloWorld
+greeting: Howdy
+name: partner
+```
 
 [//]: <> (Note: The content between `<!--mdtogo:Examples-->` and the following
 `<!--mdtogo-->` will be used as the examples for the command.)
