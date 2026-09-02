@@ -13,7 +13,8 @@
 # limitations under the License.
 
 apiVersion: fn.kpt.dev/v1alpha1
-kind: YourFunction
+kind: HelloWorld
 metadata:
   name: test
-fnConfigFoo: example
+greeting: Hello
+name: world
