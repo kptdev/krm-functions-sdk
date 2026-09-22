@@ -1,4 +1,4 @@
-// Copyright 2022 The kpt Authors
+// Copyright 2022, 2026 The kpt Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 const TestDataPath = "testdata"
 
 func TestFunction(t *testing.T) {
-	fnRunner := fn.WithContext(context.TODO(), &YourFunction{})
+	fnRunner := fn.WithContext(context.TODO(), &HelloWorld{})
 	// This golden test expects each sub-directory of `testdata` can has its input resources (in `resources.yaml`)
 	// be modified to the output resources (in `_expected.yaml`).
 	testhelpers.RunGoldenTests(t, TestDataPath, fnRunner)

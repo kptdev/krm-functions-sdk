@@ -47,7 +47,7 @@ func main() {
 }
 ```
 
-A starter template is available at [`go/get-started/`](go/get-started/main.go). For the full walkthrough, see the [Tutorial](docs/tutorial.md).
+A starter template is available at [`go/get-started/`](go/get-started/main.go). For the full walkthrough, see the [Tutorial](https://kpt.dev/guides/krm-functions/tutorial/).
 
 ## How It Works
 
@@ -71,15 +71,18 @@ The SDK provides two interfaces for implementing functions:
 | `fn.Runner` | Transformers, validators | No | Yes |
 | `fn.ResourceListProcessor` | Generators, complex functions | Yes | No |
 
-See [Interfaces](docs/interfaces.md) for details and code examples.
+See [Interfaces](https://kpt.dev/guides/krm-functions/interfaces/) for details and code examples.
 
 ## Documentation
 
+The [KRM Function Developer Guide](https://kpt.dev/guides/krm-functions/) on
+kpt.dev is the source of truth for function-authoring documentation.
+
 - [API Reference](https://pkg.go.dev/github.com/kptdev/krm-functions-sdk/go/fn) — Go API docs
-- [Tutorial](docs/tutorial.md) — end-to-end function development
-- [Interfaces](docs/interfaces.md) — Runner vs ResourceListProcessor
-- [Testing](docs/testing.md) — golden test patterns
-- [Containerizing](docs/containerizing.md) — building and running function images
+- [Tutorial](https://kpt.dev/guides/krm-functions/tutorial/) — end-to-end function development
+- [Interfaces](https://kpt.dev/guides/krm-functions/interfaces/) — Runner vs ResourceListProcessor
+- [Testing](https://kpt.dev/guides/krm-functions/testing/) — golden test patterns
+- [Containerizing](https://kpt.dev/guides/krm-functions/containerizing/) — building and running function images
 
 ## Versioning
 
