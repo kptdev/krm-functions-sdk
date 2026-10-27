@@ -17,6 +17,7 @@ import (
     _ "embed"
     "os"
 
+    "github.com/kptdev/kpt/api/kubeobject"
     "github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
@@ -30,7 +31,7 @@ type SetLabels struct {
     Labels map[string]string `json:"labels,omitempty"`
 }
 
-func (r *SetLabels) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects, results *fn.Results) bool {
+func (r *SetLabels) Run(ctx *fn.Context, functionConfig *kubeobject.KubeObject, items kubeobject.KubeObjects, results *kubeobject.Results) bool {
     for _, obj := range items {
         for k, v := range r.Labels {
             obj.SetLabel(k, v)
@@ -69,7 +70,7 @@ The SDK provides two interfaces for implementing functions:
 | Interface | Use for | Can add/remove items? | Auto-parses config? |
 |---|---|---|---|
 | `fn.Runner` | Transformers, validators | No | Yes |
-| `fn.ResourceListProcessor` | Generators, complex functions | Yes | No |
+| `kubeobject.ResourceListProcessor` | Generators, complex functions | Yes | No |
 
 See [Interfaces](https://kpt.dev/guides/krm-functions/interfaces/) for details and code examples.
 

@@ -17,28 +17,29 @@ package example_test
 import (
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
 // This example implements a function that updates the replicas field for all deployments.
 
 func Example_filterGVK() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(updateReplicas)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(updateReplicas)); err != nil {
 		os.Exit(1)
 	}
 }
 
 // updateReplicas sets a field in resources selecting by GVK.
-func updateReplicas(rl *fn.ResourceList) (bool, error) {
+func updateReplicas(rl *kubeobject.ResourceList) (bool, error) {
 	if rl.FunctionConfig == nil {
-		return false, fn.ErrMissingFnConfig{}
+		return false, kubeobject.ErrMissingFnConfig{}
 	}
 	var replicas int
 	found, err := rl.FunctionConfig.NestedResource(&replicas, "replicas")
 	if err != nil || !found {
 		return found, err
 	}
-	for i := range rl.Items.Where(fn.IsGVK("apps", "v1", "Deployment")) {
+	for i := range rl.Items.Where(kubeobject.IsGVK("apps", "v1", "Deployment")) {
 		if err := rl.Items[i].SetNestedField(replicas, "spec", "replicas"); err != nil {
 			return false, err
 		}

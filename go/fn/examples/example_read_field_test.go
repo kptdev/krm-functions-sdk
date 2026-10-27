@@ -17,19 +17,20 @@ package example
 import (
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
 // In this example, we read a field from the input object and print it to the log.
 
 func Example_aReadField() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(readField)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(readField)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func readField(rl *fn.ResourceList) (bool, error) {
-	for _, obj := range rl.Items.Where(fn.IsGVK("apps", "v1", "Deployment")) {
+func readField(rl *kubeobject.ResourceList) (bool, error) {
+	for _, obj := range rl.Items.Where(kubeobject.IsGVK("apps", "v1", "Deployment")) {
 		// Style 1: like using unstrucuted.Unstructured, get/set the value from field paths*
 		replicas, _, _ := obj.NestedInt64("spec", "replicas")
 		fn.Logf("replicas is %v\n", replicas)

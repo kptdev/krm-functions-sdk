@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -232,7 +233,7 @@ data:
 	assert.Equal(t, "direct-test", rl.Items[0].GetName())
 	assert.Equal(t, "ConfigMap", rl.Items[0].GetKind())
 
-	// FunctionConfig should be set (empty KubeObject).
+	// FunctionConfig should be set (empty kubeobject.KubeObject).
 	assert.NotNil(t, rl.FunctionConfig)
 }
 
@@ -329,7 +330,7 @@ metadata:
 	require.NoError(t, os.WriteFile(filePath, []byte(configMap), 0600))
 
 	// Use a processor that adds a label to all items.
-	labelProc := ResourceListProcessorFunc(func(rl *ResourceList) (bool, error) {
+	labelProc := kubeobject.ResourceListProcessorFunc(func(rl *kubeobject.ResourceList) (bool, error) {
 		for _, item := range rl.Items {
 			if err := item.SetLabel("added-by", "test"); err != nil {
 				return false, err
@@ -399,7 +400,7 @@ metadata:
 	assert.Contains(t, output, "kind: ResourceList")
 
 	// Verify we can parse the output.
-	rl, err := ParseResourceList([]byte(output))
+	rl, err := kubeobject.ParseResourceList([]byte(output))
 	require.NoError(t, err)
 	assert.Len(t, rl.Items, 1)
 	assert.Equal(t, "only-item", rl.Items[0].GetName())

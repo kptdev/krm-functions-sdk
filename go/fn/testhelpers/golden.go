@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kptdev/krm-functions-sdk/go/fn"
+	"github.com/kptdev/kpt/api/kubeobject"
 )
 
 // RunGoldenTests provides the test infra to run golden test.
@@ -44,7 +44,7 @@ import (
 //	        └── resources.yaml
 //
 // - "krmFunction" should be your ResourceListProcessor implementation.
-func RunGoldenTests(t *testing.T, basedir string, krmFunction fn.ResourceListProcessor) {
+func RunGoldenTests(t *testing.T, basedir string, krmFunction kubeobject.ResourceListProcessor) {
 	dirEntries, err := os.ReadDir(basedir)
 	if err != nil {
 		t.Fatalf("ReadDir(%q) failed: %v", basedir, err)
@@ -63,7 +63,7 @@ func RunGoldenTests(t *testing.T, basedir string, krmFunction fn.ResourceListPro
 				t.Fatalf("failed to read directory %q: %v", basedir, err)
 			}
 			sort.Slice(files, func(i, j int) bool { return files[i].Name() < files[j].Name() })
-			var items []*fn.KubeObject
+			var items []*kubeobject.KubeObject
 			for _, f := range files {
 				if strings.HasPrefix(f.Name(), "_") {
 					continue
@@ -79,15 +79,15 @@ func RunGoldenTests(t *testing.T, basedir string, krmFunction fn.ResourceListPro
 
 			config := mustParseFile(t, filepath.Join(dir, "_fnconfig.yaml"))
 
-			var functionConfig *fn.KubeObject
+			var functionConfig *kubeobject.KubeObject
 			if len(config) == 0 {
-				functionConfig = fn.NewEmptyKubeObject()
+				functionConfig = kubeobject.NewEmptyKubeObject()
 			} else if len(config) == 1 {
 				functionConfig = config[0]
 			} else {
 				t.Fatalf("found multiple config objects in %s", filepath.Join(dir, "_fnconfig.yaml"))
 			}
-			rl := &fn.ResourceList{Items: items, FunctionConfig: functionConfig}
+			rl := &kubeobject.ResourceList{Items: items, FunctionConfig: functionConfig}
 			_, err = krmFunction.Process(rl)
 			if err != nil {
 				t.Fatalf("run failed unexpectedly: %v", err)
@@ -262,13 +262,13 @@ func CompareFile(t *testing.T, expectDir, actualDir string, relPath string) {
 	CompareGoldenFile(t, expectAbs, actualBytes)
 }
 
-func mustParseFile(t *testing.T, path string) fn.KubeObjects {
+func mustParseFile(t *testing.T, path string) kubeobject.KubeObjects {
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		return nil
 	}
 	b := MustReadFile(t, path)
 
-	objects, err := fn.ParseKubeObjects(b)
+	objects, err := kubeobject.ParseKubeObjects(b)
 	if err != nil {
 		t.Fatalf("failed to parse objects from file %q: %v", path, err)
 	}

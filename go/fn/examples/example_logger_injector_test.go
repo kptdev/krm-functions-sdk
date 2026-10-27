@@ -17,6 +17,7 @@ package example
 import (
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	corev1 "k8s.io/api/core/v1"
 	yaml2 "sigs.k8s.io/kustomize/kyaml/yaml"
 
@@ -27,14 +28,14 @@ import (
 // container in workload APIs.
 
 func Example_loggeInjector() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(injectLogger)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(injectLogger)); err != nil {
 		os.Exit(1)
 	}
 }
 
 // injectLogger injects a logger container into the workload API resources.
 // generate implements the gokrmfn.KRMFunction interface.
-func injectLogger(rl *fn.ResourceList) (bool, error) {
+func injectLogger(rl *kubeobject.ResourceList) (bool, error) {
 	var li LoggerInjection
 	if err := rl.FunctionConfig.As(&li); err != nil {
 		return false, err

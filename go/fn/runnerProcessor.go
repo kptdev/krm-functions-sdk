@@ -19,10 +19,11 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	schema "github.com/kptdev/kpt/api/schema/v1"
 )
 
-func WithContext(ctx context.Context, runner Runner) ResourceListProcessor {
+func WithContext(ctx context.Context, runner Runner) kubeobject.ResourceListProcessor {
 	return runnerProcessor{ctx: ctx, fnRunner: runner}
 }
 
@@ -34,7 +35,7 @@ type runnerProcessor struct {
 // EmptyFunctionConfig is a workaround solution to handle the case where kpt passes in a functionConfig placeholder
 // (Configmap with empty `data`) if user does not provide the actual FunctionConfig. Ideally, kpt should pass in an empty
 // FunctionConfig object.
-func EmptyFunctionConfig(o *KubeObject) bool {
+func EmptyFunctionConfig(o *kubeobject.KubeObject) bool {
 	data, found, err := o.NestedStringMap("data")
 	// Some other type
 	if !found || err != nil {
@@ -49,7 +50,7 @@ func EmptyFunctionConfig(o *KubeObject) bool {
 //  2. ConfigMap type, it requires the Runner instance to have one contributes of type map[string]string to receive the ConfigMap `.data` value.
 //  3. Runner type, it uses the Runner struct name as the FunctionConfig Kind. e.g. if the Runner is `SetNamespace`,
 //     the FunctionConfig should be `{"Kind": "SetNamespace", "apiVersion": "fn.kpt.dev/v1alpha1"}
-func (r runnerProcessor) Process(rl *ResourceList) (bool, error) {
+func (r runnerProcessor) Process(rl *kubeobject.ResourceList) (bool, error) {
 	// Validate and Parse the input FunctionConfig to r.fnRunner
 	if rl.FunctionConfig.IsEmpty() || EmptyFunctionConfig(rl.FunctionConfig) {
 		// functions may not need functionConfig.
@@ -63,7 +64,7 @@ func (r runnerProcessor) Process(rl *ResourceList) (bool, error) {
 	}
 	// Run the main function.
 	fnCtx := &Context{Context: r.ctx}
-	results := new(Results)
+	results := new(kubeobject.Results)
 	shouldPass := r.fnRunner.Run(fnCtx, rl.FunctionConfig, rl.Items, results)
 	// If running in a pipeline, the ResourceList may already have results from previous function runs.
 	// Thus, we only append new results to the end.
@@ -71,7 +72,7 @@ func (r runnerProcessor) Process(rl *ResourceList) (bool, error) {
 	return shouldPass, nil
 }
 
-func (r *runnerProcessor) config(o *KubeObject) error {
+func (r *runnerProcessor) config(o *kubeobject.KubeObject) error {
 	if r.fnRunner == nil {
 		return fmt.Errorf("the object which implements `ResourceListProcessor` interface requires a `Runner` or `fnRunner` attribute," +
 			" got nil")
@@ -83,10 +84,10 @@ func (r *runnerProcessor) config(o *KubeObject) error {
 			return err
 		}
 		return assignCMDataToFn(r.fnRunner, data)
-	case schema.GroupKind{Group: KptFunctionGroup, Kind: asFnName(r.fnRunner)}:
+	case schema.GroupKind{Group: kubeobject.KptFunctionGroup, Kind: asFnName(r.fnRunner)}:
 		return o.As(r.fnRunner)
 	default:
-		return fmt.Errorf("unknown FunctionConfig `%v`, expect `%v.%v` or `ConfigMap.v1`", o.GroupKind(), asFnName(r.fnRunner), KptFunctionGroup)
+		return fmt.Errorf("unknown FunctionConfig `%v`, expect `%v.%v` or `ConfigMap.v1`", o.GroupKind(), asFnName(r.fnRunner), kubeobject.KptFunctionGroup)
 	}
 }
 

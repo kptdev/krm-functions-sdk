@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
@@ -26,7 +27,7 @@ import (
 
 type RemoveAllResources struct{}
 
-func (*RemoveAllResources) Process(rl *fn.ResourceList) (bool, error) {
+func (*RemoveAllResources) Process(rl *kubeobject.ResourceList) (bool, error) {
 	rl.Items = nil
 	return true, nil
 }

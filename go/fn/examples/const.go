@@ -14,14 +14,14 @@
 
 package example
 
-import "github.com/kptdev/krm-functions-sdk/go/fn"
+import "github.com/kptdev/kpt/api/kubeobject"
 
 const (
 	apps = "apps"
 	v1   = "v1"
 )
 
-func hasDesiredGVK(obj *fn.KubeObject) bool {
+func hasDesiredGVK(obj *kubeobject.KubeObject) bool {
 	return obj.IsGVK(apps, v1, "Deployment") || obj.IsGVK(apps, v1, "StatefulSet") ||
 		obj.IsGVK(apps, v1, "DaemonSet") || obj.IsGVK(apps, v1, "ReplicaSet")
 }

@@ -15,13 +15,13 @@
 package example_test
 
 import (
-	"github.com/kptdev/krm-functions-sdk/go/fn"
+	"github.com/kptdev/kpt/api/kubeobject"
 	corev1 "k8s.io/api/core/v1"
 )
 
 var (
-	deployment fn.KubeObject
-	configMap  fn.KubeObject
+	deployment kubeobject.KubeObject
+	configMap  kubeobject.KubeObject
 )
 
 func Example_kubeObjectMutatePrimitiveField() {

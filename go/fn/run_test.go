@@ -19,13 +19,14 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 )
 
 func TestRunEmptyInputBytes(t *testing.T) {
-	var noOpFn ResourceListProcessorFunc = func(rl *ResourceList) (bool, error) {
+	var noOpFn kubeobject.ResourceListProcessorFunc = func(rl *kubeobject.ResourceList) (bool, error) {
 		return true, nil
 	}
 
@@ -37,22 +38,22 @@ func TestRunEmptyInputBytes(t *testing.T) {
 
 type myRLP struct{}
 
-func (*myRLP) Process(*ResourceList) (bool, error) {
+func (*myRLP) Process(*kubeobject.ResourceList) (bool, error) {
 	return true, nil
 }
 
-func myRLPF(*ResourceList) (bool, error) {
+func myRLPF(*kubeobject.ResourceList) (bool, error) {
 	return true, nil
 }
 
 type myFR struct{}
 
-func (*myFR) Run(*Context, *KubeObject, KubeObjects, *Results) bool {
+func (*myFR) Run(*Context, *kubeobject.KubeObject, kubeobject.KubeObjects, *kubeobject.Results) bool {
 	return true
 }
 
-var _ ResourceListProcessor = &myRLP{}
-var _ ResourceListProcessorFunc = myRLPF
+var _ kubeobject.ResourceListProcessor = &myRLP{}
+var _ kubeobject.ResourceListProcessorFunc = myRLPF
 var _ Runner = &myFR{}
 
 func TestAsMainTypes(t *testing.T) {
@@ -72,9 +73,9 @@ func TestAsMainTypes(t *testing.T) {
 	testCases := map[string]any{
 		"ResourceListProcessor":              &myRLP{},
 		"Implicit ResourceListProcessorFunc": myRLPF,
-		"Explicit ResourceListProcessorFunc": ResourceListProcessorFunc(myRLPF),
+		"Explicit ResourceListProcessorFunc": kubeobject.ResourceListProcessorFunc(myRLPF),
 		"RunnerProcessor":                    runnerProcessor{ctx: t.Context(), fnRunner: &myFR{}},
-		"Anonymous":                          func(*ResourceList) (bool, error) { return true, nil },
+		"Anonymous":                          func(*kubeobject.ResourceList) (bool, error) { return true, nil },
 	}
 
 	for name, input := range testCases {
