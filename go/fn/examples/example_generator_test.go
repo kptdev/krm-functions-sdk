@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 
 	corev1 "k8s.io/api/core/v1"
@@ -30,15 +31,15 @@ import (
 // accepts Revision and ID as input.
 
 func Example_generator() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(generate)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(generate)); err != nil {
 		os.Exit(1)
 	}
 }
 
 // generate generates a ConfigMap.
-func generate(rl *fn.ResourceList) (bool, error) {
+func generate(rl *kubeobject.ResourceList) (bool, error) {
 	if rl.FunctionConfig == nil {
-		return false, fn.ErrMissingFnConfig{}
+		return false, kubeobject.ErrMissingFnConfig{}
 	}
 
 	revision, _, _ := rl.FunctionConfig.NestedString("data", "revision")

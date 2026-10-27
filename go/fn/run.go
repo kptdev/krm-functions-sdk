@@ -22,6 +22,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal/docs"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio"
@@ -48,7 +49,7 @@ func WithDocs(readme []byte, meta []byte) Option {
 // STDIN, processes it, and writes the result to STDOUT.
 //
 // `input` can be
-// - a `ResourceListProcessor` which implements `Process` method
+// - a `kubeobject.ResourceListProcessor` which implements `Process` method
 // - a function `Runner` which implements `Run` method
 //
 // Invocation modes (checked in this order):
@@ -86,12 +87,12 @@ func AsMain(input any, opts ...Option) error {
 	}
 
 	err := func() error {
-		var p ResourceListProcessor
+		var p kubeobject.ResourceListProcessor
 		switch cast := input.(type) {
-		case ResourceListProcessor:
+		case kubeobject.ResourceListProcessor:
 			p = cast
-		case func(*ResourceList) (bool, error):
-			p = ResourceListProcessorFunc(cast)
+		case func(*kubeobject.ResourceList) (bool, error):
+			p = kubeobject.ResourceListProcessorFunc(cast)
 		default:
 			return fmt.Errorf("unknown input type %T", input)
 		}
@@ -178,9 +179,9 @@ func handleDoc(cfg *mainConfig) error {
 // Each file is parsed as one or more KRM YAML documents (separated by ---).
 // Empty files are valid (no items added). Returns a descriptive error if a
 // file does not exist or contains invalid YAML.
-func readFilesAsResourceList(paths []string) (*ResourceList, error) {
-	rl := &ResourceList{
-		FunctionConfig: NewEmptyKubeObject(),
+func readFilesAsResourceList(paths []string) (*kubeobject.ResourceList, error) {
+	rl := &kubeobject.ResourceList{
+		FunctionConfig: kubeobject.NewEmptyKubeObject(),
 	}
 	for _, path := range paths {
 		cleanPath := filepath.Clean(path)
@@ -192,7 +193,7 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 		if len(strings.TrimSpace(string(data))) == 0 {
 			continue
 		}
-		objects, err := ParseKubeObjects(data)
+		objects, err := kubeobject.ParseKubeObjects(data)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse KRM resources from %s: %w", path, err)
 		}
@@ -205,11 +206,11 @@ func readFilesAsResourceList(paths []string) (*ResourceList, error) {
 
 // Run evaluates the function. input must be a resourceList in yaml format. An
 // updated resourceList will be returned.
-func Run(p ResourceListProcessor, input []byte) ([]byte, error) {
+func Run(p kubeobject.ResourceListProcessor, input []byte) ([]byte, error) {
 	if p == nil {
 		return nil, fmt.Errorf("nil ResourceListProcessor")
 	}
-	rl, err := ParseResourceList(input)
+	rl, err := kubeobject.ParseResourceList(input)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +228,7 @@ func Run(p ResourceListProcessor, input []byte) ([]byte, error) {
 	return out, nil
 }
 
-func Execute(p ResourceListProcessor, r io.Reader, w io.Writer) error {
+func Execute(p kubeobject.ResourceListProcessor, r io.Reader, w io.Writer) error {
 	rw := &byteReadWriter{
 		kio.ByteReadWriter{
 			Reader: r,
@@ -243,7 +244,7 @@ func Execute(p ResourceListProcessor, r io.Reader, w io.Writer) error {
 	return execute(p, rw)
 }
 
-func execute(p ResourceListProcessor, rw *byteReadWriter) error {
+func execute(p kubeobject.ResourceListProcessor, rw *byteReadWriter) error {
 	// Read the input
 	rl, err := rw.Read()
 	if err != nil {

@@ -17,18 +17,19 @@ package example
 import (
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
 // In this example, we read a field from the input object and print it to the log.
 
 func Example_cSetField() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(setField)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(setField)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func setField(rl *fn.ResourceList) (bool, error) {
+func setField(rl *kubeobject.ResourceList) (bool, error) {
 	for _, obj := range rl.Items {
 		if obj.GetAPIVersion() == "apps/v1" && obj.GetKind() == "Deployment" {
 			replicas := 10

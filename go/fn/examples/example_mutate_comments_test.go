@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
@@ -26,12 +27,12 @@ import (
 // apply-setters function: https://catalog.kpt.dev/apply-setters/v0.2/)
 
 func Example_dMutateComments() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(mutateComments)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(mutateComments)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func mutateComments(rl *fn.ResourceList) (bool, error) {
+func mutateComments(rl *kubeobject.ResourceList) (bool, error) {
 	for i := range rl.Items {
 		lineComment, found, err := rl.Items[i].LineComment("metadata", "name")
 		if err != nil {

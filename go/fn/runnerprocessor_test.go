@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +33,7 @@ type SetTest struct {
 	Arg map[string]string
 }
 
-func (*SetTest) Run(*Context, *KubeObject, KubeObjects, *Results) bool {
+func (*SetTest) Run(*Context, *kubeobject.KubeObject, kubeobject.KubeObjects, *kubeobject.Results) bool {
 	return true
 }
 
@@ -44,7 +45,7 @@ type SetTestNoMapString struct {
 	Arg string `yaml:"args" json:"args"`
 }
 
-func (*SetTestNoMapString) Run(*Context, *KubeObject, KubeObjects, *Results) bool {
+func (*SetTestNoMapString) Run(*Context, *kubeobject.KubeObject, kubeobject.KubeObjects, *kubeobject.Results) bool {
 	return true
 }
 
@@ -115,7 +116,7 @@ functionConfig:
 	for description, test := range testdata {
 		fnConfig := &SetTest{}
 		r := runnerProcessor{ctx: context.TODO(), fnRunner: fnConfig}
-		rl, _ := ParseResourceList(test.resourceList)
+		rl, _ := kubeobject.ParseResourceList(test.resourceList)
 		actualOk, _ := r.Process(rl)
 		assert.Equal(t, actualOk, test.expectedOk, description)
 		assert.Equal(t, test.expectedErr, rl.Results.String(), description)
@@ -198,7 +199,7 @@ args: test
 	}
 	for description, test := range testdata {
 		r := runnerProcessor{ctx: context.TODO(), fnRunner: test.runner.(Runner)}
-		fn, _ := ParseKubeObject(test.fnConfig)
+		fn, _ := kubeobject.ParseKubeObject(test.fnConfig)
 		actualErr := r.config(fn)
 		if test.expectedErr != "" {
 			assert.EqualError(t, actualErr, test.expectedErr, description)

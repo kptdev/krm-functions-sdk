@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
@@ -63,7 +64,7 @@ type HelloWorld struct {
 //
 // This example builds a greeting from the functionConfig and stamps it as an
 // annotation on every resource.
-func (r *HelloWorld) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects, results *fn.Results) bool {
+func (r *HelloWorld) Run(_ *fn.Context, _ *kubeobject.KubeObject, items kubeobject.KubeObjects, results *kubeobject.Results) bool {
 	greeting := r.Greeting
 	if greeting == "" {
 		greeting = "Hello"

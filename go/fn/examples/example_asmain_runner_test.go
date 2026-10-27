@@ -17,6 +17,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 )
 
@@ -32,7 +33,7 @@ type SetLabels struct {
 // `functionConfig` is from the STDIN "ResourceList.FunctionConfig". The value has been assigned to the r.Labels
 //
 //	the functionConfig is validated to have kind "SetLabels" and apiVersion "fn.kpt.dev/v1alpha1"
-func (r *SetLabels) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects, results *fn.Results) bool {
+func (r *SetLabels) Run(ctx *fn.Context, functionConfig *kubeobject.KubeObject, items kubeobject.KubeObjects, results *kubeobject.Results) bool {
 	for _, o := range items {
 		for k, newLabel := range r.Labels {
 			err := o.SetLabel(k, newLabel)

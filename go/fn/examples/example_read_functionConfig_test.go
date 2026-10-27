@@ -17,6 +17,7 @@ package example
 import (
 	"os"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn"
 	yaml2 "sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -25,12 +26,12 @@ import (
 // read a field from the functionConfig object.
 
 func Example_bReadFunctionConfig() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(readFunctionConfig)); err != nil {
+	if err := fn.AsMain(kubeobject.ResourceListProcessorFunc(readFunctionConfig)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func readFunctionConfig(rl *fn.ResourceList) (bool, error) {
+func readFunctionConfig(rl *kubeobject.ResourceList) (bool, error) {
 	var sr SetReplicas
 	if err := rl.FunctionConfig.As(&sr); err != nil {
 		return false, err

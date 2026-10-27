@@ -22,14 +22,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/kptdev/krm-functions-sdk/go/fn/internal/docs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// noopProcessor is a minimal ResourceListProcessor that does nothing.
+// noopProcessor is a minimal kubeobject.ResourceListProcessor that does nothing.
 // Used to satisfy AsMain's input requirement without triggering STDIN reads.
-var noopProcessor = ResourceListProcessorFunc(func(rl *ResourceList) (bool, error) {
+var noopProcessor = kubeobject.ResourceListProcessorFunc(func(rl *kubeobject.ResourceList) (bool, error) {
 	return true, nil
 })
 

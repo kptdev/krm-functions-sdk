@@ -29,7 +29,7 @@ See KRM Function Specification reference in https://github.com/kubernetes-sigs/k
 
 A KRM function can mutate and/or validate Kubernetes resources in a ResourceList.
 
-The ResourceList type and the KubeObject type are the core parts of this package.
+KubeObject, SubObject, and ResourceList live in github.com/kptdev/kpt/api/kubeobject.
 The ResourceList type maps to the ResourceList in the function spec.
 
 Read more about how to use KRM functions in https://kpt.dev/book/04-using-functions/
@@ -45,32 +45,18 @@ A general workflow is:
 
 # KubeObject
 
-The KubeObject is the basic unit to perform operations on KRM resources.
+KubeObject is the basic unit for operating on KRM resources. It, along with SubObject
+and the helpers for reading and writing resources, is provided by
+github.com/kptdev/kpt/api/kubeobject.
 
-In the "AsMain", both "Items" and "FunctionConfig"
-are converted to the KubeObject(s).
-
-If you are familiar with unstructured.Unstructured, using KubeObject is as simple as using unstructured.Unstructured.
-You can call function like `NestedStringOrDie` `SetNestedStringMap`, etc.
-
-Except that KubeObject will not have pass-in interface arguments, nor will return an interface.
-Instead, you shall treat each KubeObject field (slice, or non-string map）as SubObject.
-
-SubObject also have most of the KubeObject methods, except the MetaType or NameType specific methods like "GetNamespace", "SetLabel".
-This is because SubObject is designed as a sub object of KubeObject. SubObject to KubeObject is like `spec` section to `Deployment`.
-You can get the Deployment name from `metadata.name`, KubeObject.GetName() or KubeObject.NestedString("metadata", "name").
-But you cannot get "metadata.name" from a Deployment "spec". For "spec" SubObject, you can get the ".replicas" field by
-SubObject.NestedInt64("replicas")
-
-Besides unstructured style, another way to use KubeObject is to purely work on the KubeObject/SubObject by calling
-"GetMap", "GetSlice", "UpsertMap" which expects the return to be SubObject(s) pointer.
+In "AsMain", both "Items" and "FunctionConfig" are converted to KubeObject values.
 
 # AsMain
 
 "AsMain" is the main entrypoint. In most cases, you only need to provide the mutator or validation logic and have AsMain
 handles the ResourceList parsing, KRM resource field type detection, read from STDIN and write to STDOUT.
 
-"AsMain" accepts a struct that either implement the ResourceListProcessor interface or Runner interface.
+"AsMain" accepts a kubeobject.ResourceListProcessor or a Runner.
 
 See github.com/kptdev/krm-functions-sdk/go/fn/examples for detailed usage.
 */

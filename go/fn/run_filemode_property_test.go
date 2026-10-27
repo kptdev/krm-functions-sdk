@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kptdev/kpt/api/kubeobject"
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
@@ -115,7 +116,7 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 
 			// Process via file mode: readFilesAsResourceList → Process → ToYAML.
 			// Use a no-op processor that passes items through unchanged.
-			noopProc := ResourceListProcessorFunc(func(rl *ResourceList) (bool, error) {
+			noopProc := kubeobject.ResourceListProcessorFunc(func(rl *kubeobject.ResourceList) (bool, error) {
 				return true, nil
 			})
 
@@ -157,11 +158,11 @@ func TestProperty6_FileModeEquivalence(t *testing.T) {
 
 			// --- Compare outputs ---
 			// Parse both outputs as ResourceLists and compare items.
-			fileResultRL, err := ParseResourceList(fileOutput)
+			fileResultRL, err := kubeobject.ParseResourceList(fileOutput)
 			if err != nil {
 				return fmt.Sprintf("failed to parse file mode output: %v\n  Output:\n%s", err, string(fileOutput))
 			}
-			stdinResultRL, err := ParseResourceList(stdinOutput)
+			stdinResultRL, err := kubeobject.ParseResourceList(stdinOutput)
 			if err != nil {
 				return fmt.Sprintf("failed to parse STDIN mode output: %v\n  Output:\n%s", err, string(stdinOutput))
 			}

@@ -14,6 +14,8 @@
 
 package fn
 
+import "github.com/kptdev/kpt/api/kubeobject"
+
 type Runner interface {
 	// Run provides the entrypoint to allow you make changes to input `resourcelist.Items`
 	// Args:
@@ -24,5 +26,5 @@ type Runner interface {
 	// Returns:
 	//    return a boolean to tell whether the execution should be considered as PASS or FAIL. CLI like kpt will
 	// display the corresponding message.
-	Run(context *Context, functionConfig *KubeObject, items KubeObjects, results *Results) bool
+	Run(context *Context, functionConfig *kubeobject.KubeObject, items kubeobject.KubeObjects, results *kubeobject.Results) bool
 }
