@@ -188,18 +188,19 @@ func positionalArgs(cfg *mainConfig, args []string) ([]string, error) {
 		return paths, nil
 	}
 
-	// Everything after the first "--" is a positional argument, even if it
-	// starts with "-".
-	var afterTerminator []string
-	if i := slices.Index(args, "--"); i >= 0 {
-		afterTerminator = args[i+1:]
-		args = args[:i]
-	}
-
 	fs := flag.NewFlagSet(filepath.Base(os.Args[0]), flag.ContinueOnError)
 	// Errors are reported by AsMain; do not let the flag package print them.
 	fs.SetOutput(io.Discard)
 	cfg.registerFlags(fs)
+
+	// Everything after the first "--" that is not a flag value is a
+	// positional argument, even if it starts with "-".
+	var afterTerminator []string
+	if i := terminatorIndex(fs, args); i >= 0 {
+		afterTerminator = args[i+1:]
+		args = args[:i]
+	}
+
 	// flag.FlagSet stops parsing at the first positional argument; keep
 	// parsing the remainder to allow flags after file paths.
 	for {
@@ -213,6 +214,30 @@ func positionalArgs(cfg *mainConfig, args []string) ([]string, error) {
 		paths = append(paths, args[0])
 		args = args[1:]
 	}
+}
+
+// terminatorIndex returns the index of the first "--" in args that ends flag
+// parsing, or -1. A "--" that is the value of a preceding non-boolean flag,
+// such as in "--name --", is not a terminator.
+func terminatorIndex(fs *flag.FlagSet, args []string) int {
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if arg == "--" {
+			return i
+		}
+		if len(arg) < 2 || arg[0] != '-' || strings.Contains(arg, "=") {
+			continue
+		}
+		f := fs.Lookup(strings.TrimLeft(arg, "-"))
+		if f == nil {
+			continue // unknown flag, reported when parsing
+		}
+		if bf, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && bf.IsBoolFlag() {
+			continue
+		}
+		i++ // skip the value of the flag
+	}
+	return -1
 }
 
 // readInput reads the raw function input from the WithInput hook, or STDIN.

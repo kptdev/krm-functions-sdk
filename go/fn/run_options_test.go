@@ -404,3 +404,24 @@ func TestAsMain_WithFlags_ErrorsAreNotPrintedByTheFlagPackage(t *testing.T) {
 	// The error is reported once, by AsMain, not also as a flag package usage dump.
 	assert.Equal(t, 1, strings.Count(stderr, "not defined"), stderr)
 }
+
+func TestAsMain_WithFlags_TerminatorAsFlagValueIsNotTerminator(t *testing.T) {
+	dir := t.TempDir()
+	file := filepath.Join(dir, "a.yaml")
+	require.NoError(t, os.WriteFile(file, []byte("apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: a\n"), 0o600))
+
+	// "--" is the value of the string flag --sep, not the terminator.
+	setArgs(t, []string{"cmd", "--sep", "--", file})
+
+	var sep string
+	p := &recordingProcessor{}
+	output := captureStdout(t, func() {
+		require.NoError(t, AsMain(p, WithFlags(func(fs *flag.FlagSet) {
+			fs.StringVar(&sep, "sep", "", "separator")
+		})))
+	})
+
+	assert.Equal(t, "--", sep)
+	assert.Equal(t, 1, p.items)
+	assert.Contains(t, output, "name: a")
+}
