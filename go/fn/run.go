@@ -15,6 +15,8 @@
 package fn
 
 import (
+	goerrors "errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -35,6 +37,37 @@ type Option func(*mainConfig)
 type mainConfig struct {
 	readme   []byte // raw embedded README.md content
 	metadata []byte // raw embedded metadata.yaml content
+
+	registerFlags func(fs *flag.FlagSet) // registers function specific flags
+	readInput     func() ([]byte, error) // replaces reading STDIN
+	writeOutput   func(out []byte) error // replaces writing STDOUT
+}
+
+// WithFlags registers function specific command line flags. register is called
+// with a flag.FlagSet before the arguments are parsed. Flags and their values
+// are not treated as file paths; "--" ends flag parsing. --help and --doc are
+// reserved and handled first, and -h and -help act like --help. Flag values
+// are only valid once AsMain has parsed them.
+func WithFlags(register func(fs *flag.FlagSet)) Option {
+	return func(c *mainConfig) {
+		c.registerFlags = register
+	}
+}
+
+// WithInput replaces reading the ResourceList from STDIN. It is not used in
+// file mode.
+func WithInput(read func() ([]byte, error)) Option {
+	return func(c *mainConfig) {
+		c.readInput = read
+	}
+}
+
+// WithOutput replaces writing the ResourceList to STDOUT. It is also called
+// when the function fails, and is not called when there is no output.
+func WithOutput(write func(out []byte) error) Option {
+	return func(c *mainConfig) {
+		c.writeOutput = write
+	}
 }
 
 // WithDocs registers embedded README and metadata content for --help and --doc.
@@ -77,16 +110,17 @@ func AsMain(input any, opts ...Option) error {
 	}
 
 	// Collect non-flag positional arguments (file paths).
-	// Skip any argument that looks like a flag (starts with "-" or "--").
-	var filePaths []string
-	for _, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") {
-			continue
-		}
-		filePaths = append(filePaths, arg)
+	filePaths, err := positionalArgs(&cfg, os.Args[1:])
+	if goerrors.Is(err, flag.ErrHelp) {
+		// -h and -help are handled by the flag package, treat them as --help.
+		return handleHelp(&cfg)
+	}
+	if err != nil {
+		Logf("failed to parse arguments: %v", err)
+		return err
 	}
 
-	err := func() error {
+	err = func() error {
 		var p kubeobject.ResourceListProcessor
 		switch cast := input.(type) {
 		case kubeobject.ResourceListProcessor:
@@ -108,8 +142,7 @@ func AsMain(input any, opts ...Option) error {
 			if yamlErr != nil {
 				return yamlErr
 			}
-			_, outErr := os.Stdout.Write(out)
-			if outErr != nil {
+			if outErr := writeResult(&cfg, out); outErr != nil {
 				return outErr
 			}
 			if fnErr != nil {
@@ -121,15 +154,14 @@ func AsMain(input any, opts ...Option) error {
 			return nil
 		}
 
-		in, err := io.ReadAll(os.Stdin)
+		in, err := readInput(&cfg)
 		if err != nil {
-			return fmt.Errorf("unable to read from stdin: %v", err)
+			return err
 		}
 		out, err := Run(p, in)
 		// If there is an error, we don't return the error immediately.
 		// We write out to stdout before returning any error.
-		_, outErr := os.Stdout.Write(out)
-		if outErr != nil {
+		if outErr := writeResult(&cfg, out); outErr != nil {
 			return outErr
 		}
 		return err
@@ -137,6 +169,102 @@ func AsMain(input any, opts ...Option) error {
 	if err != nil {
 		Logf("failed to evaluate function: %v", err)
 	}
+	return err
+}
+
+// positionalArgs returns the positional (file path) arguments in args. Without
+// function specific flags (WithFlags) every argument starting with "-" is
+// skipped. With them, the flags are parsed, and flags and positional
+// arguments may be given in any order.
+func positionalArgs(cfg *mainConfig, args []string) ([]string, error) {
+	var paths []string
+	if cfg.registerFlags == nil {
+		for _, arg := range args {
+			if strings.HasPrefix(arg, "-") {
+				continue
+			}
+			paths = append(paths, arg)
+		}
+		return paths, nil
+	}
+
+	fs := flag.NewFlagSet(filepath.Base(os.Args[0]), flag.ContinueOnError)
+	// Errors are reported by AsMain; do not let the flag package print them.
+	fs.SetOutput(io.Discard)
+	cfg.registerFlags(fs)
+
+	// Everything after the first "--" that is not a flag value is a
+	// positional argument, even if it starts with "-".
+	var afterTerminator []string
+	if i := terminatorIndex(fs, args); i >= 0 {
+		afterTerminator = args[i+1:]
+		args = args[:i]
+	}
+
+	// flag.FlagSet stops parsing at the first positional argument; keep
+	// parsing the remainder to allow flags after file paths.
+	for {
+		if err := fs.Parse(args); err != nil {
+			return nil, err
+		}
+		args = fs.Args()
+		if len(args) == 0 {
+			return append(paths, afterTerminator...), nil
+		}
+		paths = append(paths, args[0])
+		args = args[1:]
+	}
+}
+
+// terminatorIndex returns the index of the first "--" in args that ends flag
+// parsing, or -1. A "--" that is the value of a preceding non-boolean flag,
+// such as in "--name --", is not a terminator.
+func terminatorIndex(fs *flag.FlagSet, args []string) int {
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if arg == "--" {
+			return i
+		}
+		if len(arg) < 2 || arg[0] != '-' || strings.Contains(arg, "=") {
+			continue
+		}
+		f := fs.Lookup(strings.TrimLeft(arg, "-"))
+		if f == nil {
+			continue // unknown flag, reported when parsing
+		}
+		if bf, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && bf.IsBoolFlag() {
+			continue
+		}
+		i++ // skip the value of the flag
+	}
+	return -1
+}
+
+// readInput reads the raw function input from the WithInput hook, or STDIN.
+func readInput(cfg *mainConfig) ([]byte, error) {
+	if cfg.readInput != nil {
+		return cfg.readInput()
+	}
+	in, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read from stdin: %v", err)
+	}
+	return in, nil
+}
+
+// writeResult writes the raw function output to the WithOutput hook, or STDOUT.
+func writeResult(cfg *mainConfig, out []byte) error {
+	if cfg.writeOutput != nil {
+		// A function that ran always produces a ResourceList. No output means
+		// that the input could not be processed; do not call the hook then, so
+		// that an existing output file, possibly the input file itself, is not
+		// overwritten with nothing.
+		if len(out) == 0 {
+			return nil
+		}
+		return cfg.writeOutput(out)
+	}
+	_, err := os.Stdout.Write(out)
 	return err
 }
 

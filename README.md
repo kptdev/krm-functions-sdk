@@ -65,6 +65,33 @@ Register embedded documentation with `fn.WithDocs`:
 fn.AsMain(runner, fn.WithDocs(readme, metadata))
 ```
 
+Functions that need their own command line flags, for example to read the input from or write the output to a file,
+can opt in with `fn.WithFlags`, `fn.WithInput` and `fn.WithOutput`:
+
+```go
+var input, output string
+
+func main() {
+    err := fn.AsMain(processor,
+        fn.WithDocs(readme, metadata),
+        fn.WithFlags(func(fs *flag.FlagSet) {
+            fs.StringVar(&input, "input", "/dev/stdin", "path to the input file")
+            fs.StringVar(&output, "output", "/dev/stdout", "path to the output file")
+        }),
+        fn.WithInput(func() ([]byte, error) { return os.ReadFile(input) }),
+        fn.WithOutput(func(out []byte) error { return os.WriteFile(output, out, 0o644) }),
+    )
+    if err != nil {
+        os.Exit(1)
+    }
+}
+```
+
+Flags are parsed by `fn.AsMain` and are not treated as file paths. `--help` and `--doc` are reserved. `--` ends flag
+parsing. The output hook is not called when the input cannot be parsed. The SDK does not generate help text for
+these flags. Describe them in the function's `README.md`, inside the documentation markers, so they appear in `--help`
+and `--doc`.
+
 The SDK provides two interfaces for implementing functions:
 
 | Interface | Use for | Can add/remove items? | Auto-parses config? |
