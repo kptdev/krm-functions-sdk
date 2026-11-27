@@ -8,7 +8,7 @@ go 1.24.0
 
 require (
 	github.com/google/go-cmp v0.7.0
-	github.com/kptdev/kpt/api v1.1.0
+	github.com/kptdev/kpt/api v1.1.1-pre.3
 	github.com/leanovate/gopter v0.2.11
 	github.com/stretchr/testify v1.12.1
 	go.yaml.in/yaml/v3 v3.0.5

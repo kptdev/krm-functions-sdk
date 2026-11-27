@@ -7,7 +7,7 @@ go 1.26.3
 replace github.com/kptdev/krm-functions-sdk/go/fn => ../
 
 require (
-	github.com/kptdev/kpt/api v1.1.0
+	github.com/kptdev/kpt/api v1.1.1-pre.3
 	github.com/kptdev/krm-functions-sdk/go/fn v0.0.0 // dummy, will always be replaced
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.36.1
