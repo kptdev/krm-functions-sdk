@@ -192,8 +192,8 @@ github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/X
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/kptdev/kpt/api v1.1.0 h1:Axq0jOUhr4zK2gakivrvsG5gj1VegMCgLEKXwpAb7fE=
-github.com/kptdev/kpt/api v1.1.0/go.mod h1:0mBPvXjoxrYGyak7jyNsEuNyVD3eaZXek2fDBH+gYQA=
+github.com/kptdev/kpt/api v1.1.1-pre.3 h1:KUcnlgAfOtOyjq8XFQhacF7a1w9KM8AjB4IrTSHXlhE=
+github.com/kptdev/kpt/api v1.1.1-pre.3/go.mod h1:LuSVqprdt+EzdImUiuflSIVl630rxjJ6c1g/8dT+H/c=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
